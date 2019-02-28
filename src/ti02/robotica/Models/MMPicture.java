@@ -36,7 +36,8 @@ public class MMPicture {
         BufferedImage outputImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 
         final Color colorEmpty = new Color(0, 0, 0);
-        final Color colorMM = new Color(255, 0, 255);
+        final Color colorMM = new Color(75, 0, 75);
+        final Color colorBounds = new Color(255, 0, 255);
 
         for (int x = 0; x < getWidth(); x++)
         {
@@ -50,8 +51,24 @@ public class MMPicture {
                         .filter((Pixel) -> Pixel.getY() == finalY)
                         .findFirst().orElse(null);
 
+                Pixel pixelNorth = getColorPixels().stream().filter((p) -> p.getX() == finalX)
+                        .filter((Pixel) -> Pixel.getY() == finalY - 1)
+                        .findFirst().orElse(null);
+                Pixel pixelSouth = getColorPixels().stream().filter((p) -> p.getX() == finalX)
+                        .filter((Pixel) -> Pixel.getY() == finalY + 1)
+                        .findFirst().orElse(null);
+                Pixel pixelWest = getColorPixels().stream().filter((p) -> p.getX() == finalX - 1)
+                        .filter((Pixel) -> Pixel.getY() == finalY)
+                        .findFirst().orElse(null);
+                Pixel pixelEast = getColorPixels().stream().filter((p) -> p.getX() == finalX + 1)
+                        .filter((Pixel) -> Pixel.getY() == finalY)
+                        .findFirst().orElse(null);
+
                 if (pixel == null) {
                     outputImage.setRGB(x, y, colorEmpty.getRGB());
+
+                    if (pixelNorth != null || pixelSouth != null || pixelWest != null || pixelEast != null)
+                        outputImage.setRGB(x, y, colorBounds.getRGB());
                 }
                 else {
                     outputImage.setRGB(x, y, colorMM.getRGB());
