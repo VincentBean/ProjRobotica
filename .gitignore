@@ -1,3 +1,6 @@
+# ignore output files
+output/
+
 # Compiled class file
 *.class
 
