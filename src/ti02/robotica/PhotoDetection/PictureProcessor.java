@@ -17,7 +17,7 @@ public class PictureProcessor {
                 Color color = new Color(source.getRGB(x, y));
                 int rgb[] = {color.getRed(), color.getGreen(), color.getBlue()};
 
-                if (rgb[0] >= 10 && rgb[1] >= 10 && rgb[2] >= 10) {
+                if (rgb[0] >= 5 && rgb[1] >= 5 && rgb[2] >= 5) {
                     // Als pixel niet zwart is
                     Pixel pixel = new Pixel(x, y, rgb);
                     mmPicture.getColorPixels().add(pixel);
