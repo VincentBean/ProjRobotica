@@ -12,6 +12,8 @@ public class MMPicture {
     private int width;
     private int height;
 
+    private Pixel bounds[]; // 0: top left, 1: bottom right
+
     private List<Pixel> colorPixels;
 
     public MMPicture(int width, int height) {
@@ -19,6 +21,8 @@ public class MMPicture {
         this.height = height;
 
         colorPixels = new ArrayList<>();
+
+        bounds = new Pixel[2];
     }
 
     public int getWidth() {
@@ -35,11 +39,11 @@ public class MMPicture {
 
     // List omzetten naar image
     public BufferedImage toBufferedImage() {
-        BufferedImage outputImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage outputImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
 
-        final Color colorEmpty = new Color(0, 0, 0);
-        final Color colorMM = new Color(75, 0, 75);
-        final Color colorEdge = new Color(255, 0, 255);
+        final Color colorEmpty = new Color(0, 0, 0, 0);
+        final Color colorMM = new Color(75, 0, 75, 128);
+        final Color colorEdge = new Color(255, 0, 255, 128);
         final Color colorBounds = new Color(0, 255, 255);
 
         int bounds[] = {-1, -1, outputImage.getHeight(), 0};    // left, right, top, down
@@ -82,6 +86,8 @@ public class MMPicture {
                 }
                 else {
                     outputImage.setRGB(x, y, colorMM.getRGB());
+
+
 
                     // set left bound
                     if (bounds[0] == -1)

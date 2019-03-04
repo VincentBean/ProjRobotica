@@ -12,6 +12,11 @@ public class Pixel {
         this.rgb = rgb;
     }
 
+    public Pixel(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public Pixel(int x, int y, int r, int g, int b) {
         this(x, y, new int[] {r, g, b});
     }

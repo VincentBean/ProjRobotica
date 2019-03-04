@@ -22,6 +22,8 @@ public class PictureProcessor {
                     Pixel pixel = new Pixel(x, y, rgb);
                     mmPicture.getColorPixels().add(pixel);
                 }
+
+                // Determine bounds
             }
         }
 

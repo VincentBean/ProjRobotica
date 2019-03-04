@@ -19,13 +19,25 @@ public class MMSorter {
 
         CurrentLogger.Logger.Info(mmPicture.getColorPixels().size() + "");
 
+        BufferedImage image = camera.TakePicture();
+        BufferedImage overlay = mmPicture.toBufferedImage();
+
+        // create the new image, canvas size is the max. of both image sizes
+        int w = Math.max(image.getWidth(), overlay.getWidth());
+        int h = Math.max(image.getHeight(), overlay.getHeight());
+        BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+// paint both images, preserving the alpha channels
+        Graphics g = combined.getGraphics();
+        g.drawImage(image, 0, 0, null);
+        g.drawImage(overlay, 0, 0, null);
 
 
         JPanel panel = new JPanel();
 
-        JLabel label = new JLabel(new ImageIcon(camera.TakePicture()));
+        JLabel label = new JLabel(new ImageIcon(combined));
         panel.add(label);
-        JLabel label2 = new JLabel(new ImageIcon(mmPicture.toBufferedImage()));
+        JLabel label2 = new JLabel(new ImageIcon(overlay));
         panel.add(label2);
 
         // main window
@@ -37,6 +49,5 @@ public class MMSorter {
 
         frame.pack();
         frame.setVisible(true);
-
     }
 }
