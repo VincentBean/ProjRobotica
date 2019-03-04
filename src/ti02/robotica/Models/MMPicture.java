@@ -1,5 +1,7 @@
 package ti02.robotica.Models;
 
+import ti02.robotica.Logging.CurrentLogger;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -37,7 +39,12 @@ public class MMPicture {
 
         final Color colorEmpty = new Color(0, 0, 0);
         final Color colorMM = new Color(75, 0, 75);
-        final Color colorBounds = new Color(255, 0, 255);
+        final Color colorEdge = new Color(255, 0, 255);
+        final Color colorBounds = new Color(0, 255, 255);
+
+        int bounds[] = {-1, -1, outputImage.getHeight(), 0};    // left, right, top, down
+
+        int totalPixelCount = outputImage.getWidth() * outputImage.getHeight();
 
         for (int x = 0; x < getWidth(); x++)
         {
@@ -68,12 +75,49 @@ public class MMPicture {
                     outputImage.setRGB(x, y, colorEmpty.getRGB());
 
                     if (pixelNorth != null || pixelSouth != null || pixelWest != null || pixelEast != null)
-                        outputImage.setRGB(x, y, colorBounds.getRGB());
+                        outputImage.setRGB(x, y, colorEdge.getRGB());
                 }
                 else {
                     outputImage.setRGB(x, y, colorMM.getRGB());
+
+                    // set left bound
+                    if (bounds[0] == -1)
+                        bounds[0] = x;
+
+                    // set right bound
+                    bounds[1] = x;
+
+                    // set top bound
+                    if (y <= bounds[2])
+                        bounds[2] = y;
+
+                    // set bottom bound
+                    if (y >= bounds[3])
+                        bounds[3] = y;
                 }
 
+            }
+        }
+
+        for (int x = 0; x < getWidth(); x++)
+        {
+            for (int y = 0; y < getHeight(); y++)
+            {
+                // left bound
+                if (x == bounds[0] && y >= bounds[2] && y < bounds[3])
+                    outputImage.setRGB(x, y, colorBounds.getRGB());
+
+                // right bound
+                if (x == bounds[1] && y >= bounds[2] && y < bounds[3])
+                    outputImage.setRGB(x, y, colorBounds.getRGB());
+
+                // top bound
+                if (y == bounds[2] && x >= bounds[0] && x <= bounds[1])
+                    outputImage.setRGB(x, y, colorBounds.getRGB());
+
+                // bottom bound
+                if (y == bounds[3] && x >= bounds[0] && x <= bounds[1])
+                    outputImage.setRGB(x, y, colorBounds.getRGB());
             }
         }
 
