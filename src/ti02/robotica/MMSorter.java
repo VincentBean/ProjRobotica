@@ -8,7 +8,6 @@ import ti02.robotica.PhotoDetection.PictureProcessor;
 import ti02.robotica.Util.ImageUtil;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class MMSorter {
@@ -23,8 +22,8 @@ public class MMSorter {
         MMPictureRenderer renderer = new MMPictureRenderer();
 
         BufferedImage image = camera.TakePicture();
-        BufferedImage overlay = renderer.render(mmPicture);
 
+        BufferedImage overlay = renderer.render(mmPicture);
         BufferedImage combined = ImageUtil.Combine(image, overlay);
 
         JPanel panel = new JPanel();
