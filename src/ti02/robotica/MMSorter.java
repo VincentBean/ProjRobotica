@@ -5,6 +5,7 @@ import ti02.robotica.Logging.CurrentLogger;
 import ti02.robotica.Models.MMPicture;
 import ti02.robotica.PhotoDetection.Camera;
 import ti02.robotica.PhotoDetection.PictureProcessor;
+import ti02.robotica.Util.ImageUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,19 +20,12 @@ public class MMSorter {
 
         CurrentLogger.Logger.Info(mmPicture.getColorPixels().size() + "");
 
+        MMPictureRenderer renderer = new MMPictureRenderer();
+
         BufferedImage image = camera.TakePicture();
-        BufferedImage overlay = mmPicture.toBufferedImage();
+        BufferedImage overlay = renderer.render(mmPicture);
 
-        // create the new image, canvas size is the max. of both image sizes
-        int w = Math.max(image.getWidth(), overlay.getWidth());
-        int h = Math.max(image.getHeight(), overlay.getHeight());
-        BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-
-// paint both images, preserving the alpha channels
-        Graphics g = combined.getGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.drawImage(overlay, 0, 0, null);
-
+        BufferedImage combined = ImageUtil.Combine(image, overlay);
 
         JPanel panel = new JPanel();
 
