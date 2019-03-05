@@ -6,17 +6,19 @@ import ti02.robotica.Models.MMPicture;
 import ti02.robotica.Models.Pixel;
 import ti02.robotica.Util.ImageUtil;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.MemoryImageSource;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class MMPictureRenderer {
 
-    final Color colorEmpty = new Color(0, 0, 0, 0);
-    final Color colorMM = new Color(75, 0, 75, 128);
-    final Color colorEdge = new Color(255, 0, 255, 128);
-    final Color colorBounds = new Color(0, 255, 255);
+    final int colorEmpty = 0x00000000;
+    final int colorMM = 0x804b004b;     // AARRGGBB
+    final int colorEdge = 0x80FF00FF;
+    final int ColorBounds = 0xFF00FFFF;
 
     public final int pixelsPerThread = 100;
 
@@ -111,29 +113,28 @@ public class MMPictureRenderer {
             }
         }
 
-
-        // Draw bounds
-        for (int x = 0; x < source.getWidth(); x++)
-        {
-            for (int y = 0; y < source.getHeight(); y++)
-            {
-                // left bound
-                if (x == bounds[0] && y >= bounds[2] && y < bounds[3])
-                    outputImage.setRGB(x, y, colorBounds.getRGB());
-
-                // right bound
-                if (x == bounds[1] && y >= bounds[2] && y < bounds[3])
-                    outputImage.setRGB(x, y, colorBounds.getRGB());
-
-                // top bound
-                if (y == bounds[2] && x >= bounds[0] && x <= bounds[1])
-                    outputImage.setRGB(x, y, colorBounds.getRGB());
-
-                // bottom bound
-                if (y == bounds[3] && x >= bounds[0] && x <= bounds[1])
-                    outputImage.setRGB(x, y, colorBounds.getRGB());
-            }
-        }
+//        // Draw bounds
+//        for (int x = 0; x < source.getWidth(); x++)
+//        {
+//            for (int y = 0; y < source.getHeight(); y++)
+//            {
+//                // left bound
+//                if (x == bounds[0] && y >= bounds[2] && y < bounds[3])
+//                    outputImage.setRGB(x, y, colorBounds.getRGB());
+//
+//                // right bound
+//                if (x == bounds[1] && y >= bounds[2] && y < bounds[3])
+//                    outputImage.setRGB(x, y, colorBounds.getRGB());
+//
+//                // top bound
+//                if (y == bounds[2] && x >= bounds[0] && x <= bounds[1])
+//                    outputImage.setRGB(x, y, colorBounds.getRGB());
+//
+//                // bottom bound
+//                if (y == bounds[3] && x >= bounds[0] && x <= bounds[1])
+//                    outputImage.setRGB(x, y, colorBounds.getRGB());
+//            }
+//        }
 
         Date end = new Date();
         long seconds = (end.getTime()-start.getTime())/1000;
@@ -172,11 +173,11 @@ public class MMPictureRenderer {
 
         private void renderPart()
         {
-            outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            int pixelCount = 0;
+            int[] pixels = new int[source.getWidth() * source.getHeight()]; // 0xAARRGGBB
 
             for (int x = startX; x < endX; x++)
             {
-
                 for (int y = startY; y < endY; y++)
                 {
                     //CurrentLogger.Logger.Debug((float)((int)(((float)pixelCount++ / (float)totalPixelCount) * 10000.0))/100.0 + "%");
@@ -202,22 +203,22 @@ public class MMPictureRenderer {
                             .findFirst().orElse(null);
 
                     if (pixel == null) {
-                        outputImage.setRGB(x, y, colorEmpty.getRGB());
+                        pixels[pixelCount] = colorEmpty;
+
 
                         if (pixelNorth != null || pixelSouth != null || pixelWest != null || pixelEast != null)
-                            outputImage.setRGB(x, y, colorEdge.getRGB());
+                            pixels[pixelCount] = colorEdge;
                     }
                     else {
-                        outputImage.setRGB(x, y, colorMM.getRGB());
-
-
-
+                        pixels[pixelCount] = colorMM;
                     }
 
+                    pixelCount++;
                 }
             }
 
+            MemoryImageSource AHHWHHAH = new MemoryImageSource(source.getWidth(), source.getHeight(), pixels, 0, source.getWidth());
+            outputImage = Toolkit.getDefaultToolkit().createImage(AHHWHHAH);
         }
     }
-
 }
