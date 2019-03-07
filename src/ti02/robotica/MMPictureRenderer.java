@@ -12,10 +12,8 @@ import java.util.Date;
 
 public class MMPictureRenderer {
 
-    final int colorMM = 0x804b004b; // AARRGGBB
-
     public final int pixelsPerThread = 150;
-    
+
     public BufferedImage render(MMPicture source)
     {
         BufferedImage outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -112,8 +110,10 @@ public class MMPictureRenderer {
             outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
             int[] outputImagePixelData = ((DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
 
-            for (Pixel p : source.getColorPixels()) {
-                outputImagePixelData[p.getY() * source.getWidth() + p.getX()] = colorMM;
+            for (int x = 0; x < source.getWidth(); x++) {
+                for (int y = 0; y < source.getHeight(); y++) {
+                    outputImagePixelData[y * source.getWidth() + x] = source.getPixel(x, y);
+                }
             }
         }
     }

@@ -10,6 +10,8 @@ public class PictureProcessor {
     public MMPicture findMM(BufferedImage source) {
         MMPicture mmPicture = new MMPicture(source.getWidth(), source.getHeight());
 
+        final int colorMM = 0x804b004b; // AARRGGBB
+
         for (int x = 0; x < source.getWidth(); x++)
         {
             for (int y = 0; y < source.getHeight(); y++)
@@ -19,11 +21,10 @@ public class PictureProcessor {
 
                 if (rgb[0] >= 5 && rgb[1] >= 5 && rgb[2] >= 5) {
                     // Als pixel niet zwart is
-                    Pixel pixel = new Pixel(x, y, rgb);
-                    mmPicture.getColorPixels().add(pixel);
+                    mmPicture.setPixel(x, y, colorMM);
                 }
 
-                // Determine bounds
+                // Todo: determine bounds
             }
         }
 

@@ -17,7 +17,7 @@ public class MMSorter {
 
         MMPicture mmPicture = pictureProcessor.findMM(camera.TakePicture());
 
-        CurrentLogger.Logger.Info(mmPicture.getColorPixels().size() + "");
+        CurrentLogger.Logger.Info(mmPicture.getPixelCount() + "");
 
         MMPictureRenderer renderer = new MMPictureRenderer();
 
