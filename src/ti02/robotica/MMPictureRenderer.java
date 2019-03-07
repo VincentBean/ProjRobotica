@@ -21,9 +21,7 @@ public class MMPictureRenderer {
     public BufferedImage render(MMPicture source)
     {
         BufferedImage outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-        int bounds[] = {-1, -1, outputImage.getHeight(), 0};    // left, right, top, down
-
+        
         // Create n workers to render each part of the output image
         int threadCountX = source.getWidth() / pixelsPerThread;
         int threadCountY = source.getHeight() / pixelsPerThread;
@@ -82,28 +80,6 @@ public class MMPictureRenderer {
             outputImage = ImageUtil.Combine(r.getOutputImage(), outputImage);
         }
         CurrentLogger.Logger.Debug("Done");
-
-
-
-        // Calculate bounds
-        for (int x = 0; x < source.getWidth(); x++) {
-            for (int y = 0; y < source.getHeight(); y++) {
-                // set left bound
-                if (bounds[0] == -1)
-                    bounds[0] = x;
-
-                // set right bound
-                bounds[1] = x;
-
-                // set top bound
-                if (y <= bounds[2])
-                    bounds[2] = y;
-
-                // set bottom bound
-                if (y >= bounds[3])
-                    bounds[3] = y;
-            }
-        }
 
         Date end = new Date();
         long seconds = (end.getTime()-start.getTime());
