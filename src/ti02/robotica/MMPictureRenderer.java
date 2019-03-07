@@ -166,6 +166,7 @@ public class MMPictureRenderer {
             outputImage = createImage(pixels, blub);
         }
 
+        // Source: https://stackoverflow.com/a/42621903
         private BufferedImage createImage(int[][] pixelData, BufferedImage outputImage) {
             int[] outputImagePixelData = ((DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
 
