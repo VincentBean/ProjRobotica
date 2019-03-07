@@ -141,8 +141,6 @@ public class MMPictureRenderer {
 
         private void renderPart()
         {
-            int[][] pixels = new int[source.getWidth()][source.getHeight()];
-
             outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
             int[] outputImagePixelData = ((DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
 
