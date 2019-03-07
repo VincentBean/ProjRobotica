@@ -106,8 +106,8 @@ public class MMPictureRenderer {
         }
 
         Date end = new Date();
-        long seconds = (end.getTime()-start.getTime())/1000;
-        CurrentLogger.Logger.Info("Took " + seconds + "s to complete");
+        long seconds = (end.getTime()-start.getTime());
+        CurrentLogger.Logger.Info("Took " + seconds + "ms to complete");
 
         return outputImage;
     }
