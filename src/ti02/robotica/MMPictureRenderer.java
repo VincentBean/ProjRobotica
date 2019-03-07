@@ -12,16 +12,14 @@ import java.util.Date;
 
 public class MMPictureRenderer {
 
-    final int colorEmpty = 0x00000000;  // AARRGGBB
-    final int colorMM = 0x804b004b;
+    final int colorMM = 0x804b004b; // AARRGGBB
 
     public final int pixelsPerThread = 150;
-
-
+    
     public BufferedImage render(MMPicture source)
     {
         BufferedImage outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        
+
         // Create n workers to render each part of the output image
         int threadCountX = source.getWidth() / pixelsPerThread;
         int threadCountY = source.getHeight() / pixelsPerThread;
@@ -29,7 +27,6 @@ public class MMPictureRenderer {
 
         CurrentLogger.Logger.Debug("Starting " + totalThreads + " worker threads to render the overlay");
         Date start = new Date();
-
 
         ArrayList<PartRenderer> renderers = new ArrayList<PartRenderer>();
         ArrayList<Thread> rendererThreads = new ArrayList<Thread>();
@@ -43,7 +40,6 @@ public class MMPictureRenderer {
 
                 int startY = yThread * pixelsPerThread;
                 int endY = startY + pixelsPerThread;
-
 
                 PartRenderer renderer = new PartRenderer(startX, endX, startY, endY, source);
 
@@ -72,8 +68,6 @@ public class MMPictureRenderer {
         }
         CurrentLogger.Logger.Debug("Threads finished");
 
-
-
         // Combine
         CurrentLogger.Logger.Debug("Combining results");
         for(PartRenderer r : renderers) {
@@ -87,8 +81,6 @@ public class MMPictureRenderer {
 
         return outputImage;
     }
-
-
 
     private class PartRenderer implements Runnable
     {
