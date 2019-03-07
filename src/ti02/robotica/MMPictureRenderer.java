@@ -15,7 +15,7 @@ public class MMPictureRenderer {
     final int colorEmpty = 0x00000000;  // AARRGGBB
     final int colorMM = 0x804b004b;
 
-    public final int pixelsPerThread = 100;
+    public final int pixelsPerThread = 150;
 
 
     public BufferedImage render(MMPicture source)
@@ -120,24 +120,8 @@ public class MMPictureRenderer {
             outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
             int[] outputImagePixelData = ((DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
 
-            for (int x = startX; x < endX; x++)
-            {
-                for (int y = startY; y < endY; y++)
-                {
-                    final int finalX = x;
-                    final int finalY = y;
-
-                    Pixel pixel = source.getColorPixels().stream().filter((p) -> p.getX() == finalX)
-                            .filter((Pixel) -> Pixel.getY() == finalY)
-                            .findFirst().orElse(null);
-
-                    if (pixel == null) {
-                        outputImagePixelData[y * source.getWidth() + x] = colorEmpty;
-                    }
-                    else {
-                        outputImagePixelData[y * source.getWidth() + x] = colorMM;
-                    }
-                }
+            for (Pixel p : source.getColorPixels()) {
+                outputImagePixelData[p.getY() * source.getWidth() + p.getX()] = colorMM;
             }
         }
     }
