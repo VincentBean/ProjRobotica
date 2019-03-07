@@ -133,7 +133,6 @@ public class MMPictureRenderer {
         @Override
         public void run() {
             renderPart();
-
         }
 
         public BufferedImage getOutputImage() {
@@ -142,7 +141,10 @@ public class MMPictureRenderer {
 
         private void renderPart()
         {
-            int[][] pixels = new int[source.getWidth()][source.getHeight()]; // 0xAARRGGBB
+            int[][] pixels = new int[source.getWidth()][source.getHeight()];
+
+            outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            int[] outputImagePixelData = ((DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
 
             for (int x = startX; x < endX; x++)
             {
@@ -155,31 +157,14 @@ public class MMPictureRenderer {
                             .filter((Pixel) -> Pixel.getY() == finalY)
                             .findFirst().orElse(null);
 
-                    if (pixel == null)
-                        pixels[x][y] = colorEmpty;
-                    else
-                        pixels[x][y] = colorMM;
+                    if (pixel == null) {
+                        outputImagePixelData[y * source.getWidth() + x] = colorEmpty;
+                    }
+                    else {
+                        outputImagePixelData[y * source.getWidth() + x] = colorMM;
+                    }
                 }
             }
-
-            BufferedImage blub = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            outputImage = createImage(pixels, blub);
-        }
-
-        // Source: https://stackoverflow.com/a/42621903
-        private BufferedImage createImage(int[][] pixelData, BufferedImage outputImage) {
-            int[] outputImagePixelData = ((DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
-
-            int width = outputImage.getWidth();
-            int height = outputImage.getHeight();
-
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    outputImagePixelData[y * width + x] = pixelData[x][y];
-                }
-            }
-
-            return outputImage;
         }
     }
 }
