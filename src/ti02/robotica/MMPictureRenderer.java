@@ -1,24 +1,19 @@
 package ti02.robotica;
 
-import org.omg.CORBA.Current;
 import ti02.robotica.Logging.CurrentLogger;
 import ti02.robotica.Models.MMPicture;
 import ti02.robotica.Models.Pixel;
 import ti02.robotica.Util.ImageUtil;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.MemoryImageSource;
+import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class MMPictureRenderer {
 
-    final int colorEmpty = 0x00000000;
-    final int colorMM = 0x804b004b;     // AARRGGBB
-    final int colorEdge = 0x80FF00FF;
-    final int ColorBounds = 0xFF00FFFF;
+    final int colorEmpty = 0x00000000;  // AARRGGBB
+    final int colorMM = 0x804b004b;
 
     public final int pixelsPerThread = 100;
 
@@ -28,9 +23,6 @@ public class MMPictureRenderer {
         BufferedImage outputImage = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         int bounds[] = {-1, -1, outputImage.getHeight(), 0};    // left, right, top, down
-
-        int totalPixelCount = outputImage.getWidth() * outputImage.getHeight();
-        int pixelCount = 1;
 
         // Create n workers to render each part of the output image
         int threadCountX = source.getWidth() / pixelsPerThread;
@@ -113,29 +105,6 @@ public class MMPictureRenderer {
             }
         }
 
-//        // Draw bounds
-//        for (int x = 0; x < source.getWidth(); x++)
-//        {
-//            for (int y = 0; y < source.getHeight(); y++)
-//            {
-//                // left bound
-//                if (x == bounds[0] && y >= bounds[2] && y < bounds[3])
-//                    outputImage.setRGB(x, y, colorBounds.getRGB());
-//
-//                // right bound
-//                if (x == bounds[1] && y >= bounds[2] && y < bounds[3])
-//                    outputImage.setRGB(x, y, colorBounds.getRGB());
-//
-//                // top bound
-//                if (y == bounds[2] && x >= bounds[0] && x <= bounds[1])
-//                    outputImage.setRGB(x, y, colorBounds.getRGB());
-//
-//                // bottom bound
-//                if (y == bounds[3] && x >= bounds[0] && x <= bounds[1])
-//                    outputImage.setRGB(x, y, colorBounds.getRGB());
-//            }
-//        }
-
         Date end = new Date();
         long seconds = (end.getTime()-start.getTime())/1000;
         CurrentLogger.Logger.Info("Took " + seconds + "s to complete");
@@ -173,15 +142,12 @@ public class MMPictureRenderer {
 
         private void renderPart()
         {
-            int pixelCount = 0;
-            int[] pixels = new int[source.getWidth() * source.getHeight()]; // 0xAARRGGBB
+            int[][] pixels = new int[source.getWidth()][source.getHeight()]; // 0xAARRGGBB
 
             for (int x = startX; x < endX; x++)
             {
                 for (int y = startY; y < endY; y++)
                 {
-                    //CurrentLogger.Logger.Debug((float)((int)(((float)pixelCount++ / (float)totalPixelCount) * 10000.0))/100.0 + "%");
-
                     final int finalX = x;
                     final int finalY = y;
 
@@ -189,36 +155,30 @@ public class MMPictureRenderer {
                             .filter((Pixel) -> Pixel.getY() == finalY)
                             .findFirst().orElse(null);
 
-                    Pixel pixelNorth = source.getColorPixels().stream().filter((p) -> p.getX() == finalX)
-                            .filter((Pixel) -> Pixel.getY() == finalY - 1)
-                            .findFirst().orElse(null);
-                    Pixel pixelSouth = source.getColorPixels().stream().filter((p) -> p.getX() == finalX)
-                            .filter((Pixel) -> Pixel.getY() == finalY + 1)
-                            .findFirst().orElse(null);
-                    Pixel pixelWest = source.getColorPixels().stream().filter((p) -> p.getX() == finalX - 1)
-                            .filter((Pixel) -> Pixel.getY() == finalY)
-                            .findFirst().orElse(null);
-                    Pixel pixelEast = source.getColorPixels().stream().filter((p) -> p.getX() == finalX + 1)
-                            .filter((Pixel) -> Pixel.getY() == finalY)
-                            .findFirst().orElse(null);
-
-                    if (pixel == null) {
-                        pixels[pixelCount] = colorEmpty;
-
-
-                        if (pixelNorth != null || pixelSouth != null || pixelWest != null || pixelEast != null)
-                            pixels[pixelCount] = colorEdge;
-                    }
-                    else {
-                        pixels[pixelCount] = colorMM;
-                    }
-
-                    pixelCount++;
+                    if (pixel == null)
+                        pixels[x][y] = colorEmpty;
+                    else
+                        pixels[x][y] = colorMM;
                 }
             }
 
-            MemoryImageSource AHHWHHAH = new MemoryImageSource(source.getWidth(), source.getHeight(), pixels, 0, source.getWidth());
-            outputImage = Toolkit.getDefaultToolkit().createImage(AHHWHHAH);
+            BufferedImage blub = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            outputImage = createImage(pixels, blub);
+        }
+
+        private BufferedImage createImage(int[][] pixelData, BufferedImage outputImage) {
+            int[] outputImagePixelData = ((DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
+
+            int width = outputImage.getWidth();
+            int height = outputImage.getHeight();
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    outputImagePixelData[y * width + x] = pixelData[x][y];
+                }
+            }
+
+            return outputImage;
         }
     }
 }
