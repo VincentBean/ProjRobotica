@@ -1,0 +1,17 @@
+@startuml
+(*)  --> Next MM
+--> Take picture
+--> Process picture
+--> Detect Color
+--> Route to color basket
+
+/'
+If "input is verbose" then
+--> [Yes] "turn on verbosity"
+--> "run command"
+else
+--> "run command"
+Endif
+'/
+-->(*)
+@enduml

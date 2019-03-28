@@ -1,0 +1,27 @@
+@startuml
+Title ProcessPicture
+
+start
+
+partition Initialization {
+
+    :Init detectors;
+
+}
+
+partition DetectMM {
+    :MMDetector detect;
+}
+
+partition Detectors {
+    repeat : each MM
+      :Detector detect();
+:Set MM     property;
+
+
+    repeat while (Has next detector) is (yes)
+    ->no;
+}
+stop
+
+@enduml

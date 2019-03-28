@@ -1,0 +1,68 @@
+@startuml
+
+skinparam {
+    classAttributeIconSize 0
+    'shadowing false
+    'handwritten true
+    'monospace reverse
+}
+
+class Object {
+    - Properties : Map<Class, DetectorResult>
+}
+
+class Bounds {
+    - lowX : int
+    - lowY : int
+    - highX : int
+    - highY : int
+}
+
+enum Color {
+    RED
+    GREEN
+    YELLOW
+    BROWN
+    BLUE
+}
+
+class Picture {
+    - Picture : BufferedImage
+    + RunDetector(Detector)
+}
+
+class Camera {
+    + TakePicture() : Picture
+}
+
+interface Detector {
+    detect() : DetectorResult
+}
+
+'class MMDetector implements Detector {
+'    + detect() : DetectorResult<MM>
+'}
+
+class ColorDetector implements Detector {
+    + detect() : DetectorResult<Color>
+}
+
+class BoundsDetector implements Detector {
+    + detect() : DetectorResult<Bounds>
+}
+
+class DetectorResult<T> {
+    - Result : T
+}
+
+
+'Picture --* Camera
+
+
+'Picture "1" -- "*" Detector
+Picture "1" -- "*" Object
+
+'Object "1" --* Bounds
+'Object "1" --* Color
+
+@enduml

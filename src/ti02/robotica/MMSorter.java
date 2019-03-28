@@ -9,6 +9,7 @@ import ti02.robotica.Util.ImageUtil;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 
 public class MMSorter {
     public static void main(String[] args) {
@@ -25,6 +26,9 @@ public class MMSorter {
 
         BufferedImage overlay = renderer.render(mmPicture);
         BufferedImage combined = ImageUtil.Combine(image, overlay);
+
+        int[] outputBuffer = ((DataBufferInt) combined.getRaster().getDataBuffer()).getData();
+
 
         JPanel panel = new JPanel();
 

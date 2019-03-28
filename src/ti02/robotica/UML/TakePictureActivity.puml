@@ -1,0 +1,5 @@
+@startuml
+(*)  --> Camera TakePicture
+--> Convert to BufferedImage
+-->(*)
+@enduml

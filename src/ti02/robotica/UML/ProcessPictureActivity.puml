@@ -1,0 +1,29 @@
+@startuml
+Title ProcessPicture
+
+start
+
+partition Initialization {
+
+    :Init pixel array;
+
+}
+
+partition ProcessImage {
+    repeat
+      :Add to pixel array;
+
+        if (Is lowest bound) then (yes)
+          :Set low bound;
+        endif
+
+        if (Is border) then (yes)
+          :Mark pixel as border;
+        endif
+
+    repeat while (Has more pixels) is (yes)
+    ->no;
+}
+stop
+
+@enduml

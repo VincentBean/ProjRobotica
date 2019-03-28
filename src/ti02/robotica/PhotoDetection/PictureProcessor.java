@@ -1,5 +1,6 @@
 package ti02.robotica.PhotoDetection;
 
+import ti02.robotica.Logging.CurrentLogger;
 import ti02.robotica.Models.MMPicture;
 import ti02.robotica.Models.Pixel;
 
@@ -8,6 +9,12 @@ import java.awt.image.BufferedImage;
 
 public class PictureProcessor {
     public MMPicture findMM(BufferedImage source) {
+
+        if (source == null) {
+            CurrentLogger.Logger.Error("Source image is null!");
+            return null;
+        }
+
         MMPicture mmPicture = new MMPicture(source.getWidth(), source.getHeight());
 
         final int colorMM = 0x804b004b; // AARRGGBB
