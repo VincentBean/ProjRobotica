@@ -15,6 +15,7 @@ output/
 
 # Package Files #
 *.jar
+!/libraries/*.jar
 *.war
 *.nar
 *.ear

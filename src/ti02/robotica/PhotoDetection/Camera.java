@@ -1,42 +1,36 @@
 package ti02.robotica.PhotoDetection;
 
-import com.github.sarxos.webcam.Webcam;
+import com.hopding.jrpicam.RPiCamera;
+import com.hopding.jrpicam.enums.Exposure;
+import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import ti02.robotica.Logging.CurrentLogger;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class Camera {
 
     public BufferedImage TakePicture() {
-        BufferedImage read = null;
+        BufferedImage output = null;
 
-        List<Webcam> cams = Webcam.getWebcams();
-
-        Webcam cam = cams.get(1);
-
-        cam.open();
-
-        CurrentLogger.Logger.Debug("Cams found: " + cams.size());
-
-        for (int i = 0; i < cams.size(); i++) {
-            CurrentLogger.Logger.Debug("Cam " + i + ": " + cams.get(i).getName());
-        }
-
-        BufferedImage img =  cam.getImage();
-
-        return img;
-        /*
         try {
-            read = ImageIO.read(new File("input/m_en_m_rood.jpeg"));
-        } catch (IOException e) {
+            // https://github.com/Hopding/JRPiCam
+            RPiCamera piCamera = new RPiCamera("/tmp");
+
+            piCamera.setWidth(512).setHeight(512)   // Set Camera to produce 500x500 images.
+                    .setBrightness(75)              // Adjust Camera's brightness setting.
+                    .setExposure(Exposure.SPORTS)   // Set Camera's exposure.
+                    .setTimeout(2)                  // Set Camera's timeout.
+                    .setAddRawBayer(true);          // Add Raw Bayer data to image files created by Camera.
+
+            output = piCamera.takeBufferedStill();
+
+        } catch (FailedToRunRaspistillException | InterruptedException | IOException e) {
+            CurrentLogger.Logger.Error("Error: could not take picture.");
             CurrentLogger.Logger.Error(e);
+            e.printStackTrace();
         }
 
-        return read;*/
+        return output;
     }
-
 }
