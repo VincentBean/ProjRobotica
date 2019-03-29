@@ -7,7 +7,6 @@
  * user guide available at https://docs.gradle.org/3.2.1/userguide/tutorial_java_projects.html
  */
 
-/*
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 
@@ -29,4 +28,13 @@ dependencies {
     // 'test.useTestNG()' to your build script.
     testCompile 'junit:junit:4.12'
 }
-*/
+
+// Create a .jar file
+jar {
+    // Keep jar clean:
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+
+    manifest {
+        attributes 'Main-Class': 'ti02.robotica.MMSorter.java'
+    }
+}
