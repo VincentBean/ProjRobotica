@@ -8,14 +8,17 @@ skinparam {
 }
 
 class Object {
-    - Properties : Map<Class, DetectorResult>
+    - Properties : Map<String, DetectorResult>
+    - Bounds : Bounds
+    - Pixels : int[][]
+
 }
 
 class Bounds {
-    - lowX : int
-    - lowY : int
-    - highX : int
-    - highY : int
+    - North : int
+    - East : int
+    - South : int
+    - West : int
 }
 
 enum Color {
@@ -39,9 +42,9 @@ interface Detector {
     detect() : DetectorResult
 }
 
-'class MMDetector implements Detector {
-'    + detect() : DetectorResult<MM>
-'}
+class MMDetector implements Detector {
+    + detect() : DetectorResult<List<Object>>
+}
 
 class ColorDetector implements Detector {
     + detect() : DetectorResult<Color>

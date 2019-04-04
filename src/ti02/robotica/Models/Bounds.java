@@ -1,16 +1,16 @@
 package ti02.robotica.Models;
 
 public class Bounds {
-    int north;
-    int east;
-    int south;
-    int west;
+    int North;
+    int East;
+    int South;
+    int West;
 
     public Bounds(int north, int east, int south, int west) {
-        this.north = north;
-        this.east = east;
-        this.south = south;
-        this.west = west;
+        this.North = north;
+        this.East = east;
+        this.South = south;
+        this.West = west;
     }
 
     public Bounds() {
@@ -18,18 +18,18 @@ public class Bounds {
     }
 
     public int getNorth() {
-        return north;
+        return North;
     }
 
     public int getEast() {
-        return east;
+        return East;
     }
 
     public int getSouth() {
-        return south;
+        return South;
     }
 
     public int getWest() {
-        return west;
+        return West;
     }
 }
