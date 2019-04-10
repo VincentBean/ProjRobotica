@@ -37,5 +37,6 @@
     <orderEntry type="library" name="jrpicam-1.1.1" level="project" />
     <orderEntry type="library" name="xuggle-xuggler-5.4" level="project" />
     <orderEntry type="library" name="slf4j-api-1.7.26" level="project" />
+    <orderEntry type="library" name="slf4j-jdk14-1.7.26" level="project" />
   </component>
 </module>
