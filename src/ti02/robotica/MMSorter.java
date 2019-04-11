@@ -46,7 +46,7 @@ public class MMSorter {
 //        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov");
 
         IMediaReader mediaReader = ToolFactory.makeReader("rtsp://localhost:8554/test.sdp");
-        // VLC:  vlc -vvv "https://www.youtube.com/watch?v=AkK_n5Q8M38&fmt=18" --sout '#rtp{dst=127.0.0.1,port=8554,sdp=rtsp://localhost:8554/test.sdp}'
+        // VLC:  vlc -vvv "https://www.youtube.com/watch?v=dQw4w9WgXcQ&fmt=18" --sout '#rtp{dst=127.0.0.1,port=8554,sdp=rtsp://localhost:8554/test.sdp}'
 
 //      IMediaReader mediaReader = ToolFactory.makeReader("http://raspberrypi.local:8090");
 
