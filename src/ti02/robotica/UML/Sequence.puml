@@ -1,0 +1,17 @@
+@startuml
+MMSorter -> Camera: getFrame()
+Camera --> MMSorter: Picture
+MMSorter -> Picture: runDetectors()
+loop foreach PictureDetector
+    Picture -> PictureDetector: detect()
+    PictureDetector --> Picture: DetectorResult
+end
+loop foreach Object
+    Picture -> Object: runDetectors()
+        loop foreach PictureDetector
+            Object -> ObjectDetector: detect()
+            ObjectDetector --> Object: DetectorResult
+        end
+end
+
+@enduml

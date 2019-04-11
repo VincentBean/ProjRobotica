@@ -11,7 +11,7 @@ class Object {
     - Properties : Map<String, DetectorResult>
     - Bounds : Bounds
     - Pixels : int[][]
-
+    + RunDetectors()
 }
 
 class Bounds {
@@ -31,26 +31,34 @@ enum Color {
 
 class Picture {
     - Picture : BufferedImage
-    + RunDetector(Detector)
+    + RunDetectors()
 }
 
 class Camera {
-    + TakePicture() : Picture
+    + getFrame() : Picture
 }
 
 interface Detector {
     detect() : DetectorResult
 }
 
-class MMDetector implements Detector {
+interface PictureDetector implements Detector {
+
+}
+
+interface ObjectDetector implements Detector {
+
+}
+
+class MMDetector implements PictureDetector {
     + detect() : DetectorResult<List<Object>>
 }
 
-class ColorDetector implements Detector {
+class ColorDetector implements ObjectDetector {
     + detect() : DetectorResult<Color>
 }
 
-class BoundsDetector implements Detector {
+class BoundsDetector implements ObjectDetector {
     + detect() : DetectorResult<Bounds>
 }
 
