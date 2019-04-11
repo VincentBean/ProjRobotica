@@ -1,42 +1,30 @@
 package ti02.robotica.PhotoDetection;
 
-import com.github.sarxos.webcam.Webcam;
 import ti02.robotica.Logging.CurrentLogger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class Camera {
 
     public BufferedImage TakePicture() {
-        BufferedImage read = null;
+        CurrentLogger.Logger.Info("Taking picture..");
+        BufferedImage output = null;
+        long start = System.currentTimeMillis();
 
-        List<Webcam> cams = Webcam.getWebcams();
-
-        Webcam cam = cams.get(1);
-
-        cam.open();
-
-        CurrentLogger.Logger.Debug("Cams found: " + cams.size());
-
-        for (int i = 0; i < cams.size(); i++) {
-            CurrentLogger.Logger.Debug("Cam " + i + ": " + cams.get(i).getName());
-        }
-
-        BufferedImage img =  cam.getImage();
-
-        return img;
-        /*
         try {
-            read = ImageIO.read(new File("input/m_en_m_rood.jpeg"));
+            output = ImageIO.read(new File("input/m_en_m_rood.jpeg"));
+
+            CurrentLogger.Logger.Info("Finished taking picture. Took " + (System.currentTimeMillis() - start) + " ms.");
+
         } catch (IOException e) {
+            CurrentLogger.Logger.Error("Error: could not take picture.");
             CurrentLogger.Logger.Error(e);
+            e.printStackTrace();
         }
 
-        return read;*/
+        return output;
     }
-
 }
