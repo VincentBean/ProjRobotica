@@ -24,6 +24,7 @@ public class MMSorter {
     private static VideoImage mScreen = null;
     private static Camera camera;
     private static PictureProcessor pictureProcessor;
+    private static long previousTimestamp = System.currentTimeMillis();
 
     private static IMediaListener mediaListener = new MediaListenerAdapter() {
         @Override
@@ -43,6 +44,7 @@ public class MMSorter {
         pictureProcessor = new PictureProcessor();
 
         IMediaReader mediaReader = ToolFactory.makeReader("rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov");
+//        IMediaReader mediaReader = ToolFactory.makeReader("http://raspberrypi.local:8090");
 
         mediaReader.setBufferedImageTypeToGenerate(BufferedImage.TYPE_3BYTE_BGR);
         mediaReader.setQueryMetaData(false);
@@ -75,6 +77,9 @@ public class MMSorter {
 //        BufferedImage combined = ImageUtil.Combine(rendered, inputImage);
 
         mScreen.setImage(overlay);
+
+        CurrentLogger.Logger.Info(1000/(System.currentTimeMillis() - previousTimestamp) +" fps");
+        previousTimestamp = System.currentTimeMillis();
     }
 
     /**
