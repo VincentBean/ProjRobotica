@@ -21,7 +21,8 @@ import com.xuggle.xuggler.IError;
 import com.xuggle.xuggler.demos.VideoImage;
 
 public class MMSorter {
-    private static VideoImage mScreen = null;
+    private static VideoImage mScreenProcessed = null;
+    private static VideoImage mScreenSource = null;
     private static Camera camera;
     private static PictureProcessor pictureProcessor;
     private static long previousTimestamp = System.currentTimeMillis();
@@ -44,9 +45,9 @@ public class MMSorter {
         pictureProcessor = new PictureProcessor();
 
 //        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov");
-
-        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://localhost:8554/test.sdp");
-        // VLC:  vlc -vvv "https://www.youtube.com/watch?v=dQw4w9WgXcQ&fmt=18" --sout '#rtp{dst=127.0.0.1,port=8554,sdp=rtsp://localhost:8554/test.sdp}'
+        IMediaReader mediaReader = ToolFactory.makeReader("input/mms.mp4");
+//        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://localhost:8554/test.sdp");
+        // VLC: vlc -vvv "https://www.youtube.com/watch?v=dQw4w9WgXcQ&fmt=18" --sout '#rtp{dst=127.0.0.1,port=8554,sdp=rtsp://localhost:8554/test.sdp}'
 
 //      IMediaReader mediaReader = ToolFactory.makeReader("http://raspberrypi.local:8090");
 
@@ -71,16 +72,17 @@ public class MMSorter {
 
     private static void updateJavaWindow(BufferedImage inputImage)
     {
+        mScreenSource.setImage(inputImage);
+        mScreenSource.setLocation(inputImage.getWidth(),0);
+
         MMPicture mmPicture = pictureProcessor.findMM(inputImage);
 
 //        CurrentLogger.Logger.Info(mmPicture.getPixelCount() + "");
 
         MMPictureRenderer renderer = new MMPictureRenderer();
 
-        BufferedImage overlay = renderer.render(mmPicture);
-//        BufferedImage combined = ImageUtil.Combine(rendered, inputImage);
-
-        mScreen.setImage(overlay);
+        BufferedImage processed = renderer.render(mmPicture);
+        mScreenProcessed.setImage(processed);
 
         CurrentLogger.Logger.Info(1000/(System.currentTimeMillis() - previousTimestamp) +" fps");
         previousTimestamp = System.currentTimeMillis();
@@ -91,7 +93,8 @@ public class MMSorter {
      */
     private static void openJavaWindow()
     {
-        mScreen = new VideoImage();
+        mScreenProcessed = new VideoImage();
+        mScreenSource = new VideoImage();
     }
 
     /**

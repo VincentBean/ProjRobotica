@@ -60,7 +60,7 @@ public class PictureProcessor {
                 }
 
                 // Bepaal of er een object aanwezig is in dit blok
-                if (averageRed <= 127 && averageGreen >= 127 && averageBlue <= 127) {
+                if (averageRed >= 5 && averageGreen >= 5 && averageBlue >= 5) {
                     objectFound[Xblock / blockSize][Yblock / blockSize] = true;
                 } else {
                     objectFound[Xblock / blockSize][Yblock / blockSize] = false;
