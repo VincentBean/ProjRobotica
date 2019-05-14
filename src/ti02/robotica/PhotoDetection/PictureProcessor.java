@@ -86,21 +86,25 @@ public class PictureProcessor {
 //              // Wanneer er een object aanwezig is
                 if (yResult)
                 {
-                    // Kleur hele blok in
-                    for (int xkwadraat = x * blockSize - blockSize; xkwadraat < (x*blockSize); xkwadraat++)
-                    {
-                        for (int ykwadraat = y * blockSize - blockSize; ykwadraat < (y*blockSize); ykwadraat++)
-                        {
-//                            CurrentLogger.Logger.Info("Xkwadraat="+xkwadraat+", Ykwadraat="+ykwadraat);
-                            mmPicture.setPixel(xkwadraat, ykwadraat, colorBlack);
-
-                        }
-                    }
+                    drawBlock(mmPicture, blockSize, x, y, colorBlack);
                 }
             }
         }
 
         return mmPicture;
+    }
+
+    void drawBlock(MMPicture mmPicture, int blockSize, int x, int y, int color) {
+        // Kleur hele blok in
+        for (int xkwadraat = x * blockSize - blockSize; xkwadraat < (x*blockSize); xkwadraat++)
+        {
+            for (int ykwadraat = y * blockSize - blockSize; ykwadraat < (y*blockSize); ykwadraat++)
+            {
+//                            CurrentLogger.Logger.Info("Xkwadraat="+xkwadraat+", Ykwadraat="+ykwadraat);
+                mmPicture.setPixel(xkwadraat, ykwadraat, color);
+
+            }
+        }
     }
 
     // Bereken gemiddelde - https://stackoverflow.com/a/16757630
