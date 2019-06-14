@@ -1,6 +1,7 @@
 package ti02.robotica.PhotoDetection;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import ti02.robotica.Logging.ConsoleLogger;
 import ti02.robotica.Logging.CurrentLogger;
 import ti02.robotica.Models.MMPicture;
 import ti02.robotica.Models.Pixel;
@@ -74,8 +75,8 @@ public class PictureProcessor {
 
         for (Boolean[] xResult : objectFound)
         {
-            x++;
             y = 0;
+            x++;
 
             for (Boolean yResult : xResult)
             {
@@ -87,7 +88,27 @@ public class PictureProcessor {
                 if (yResult)
                 {
                     drawBlock(mmPicture, blockSize, x, y, colorBlack);
+
+//                    // North edge
+//                    if (!objectFound[x][y-1]) {
+//                        drawBlock(mmPicture, blockSize, x, y-1, colorRed);
+//                    }
+//                    // South edge
+//                    if (!objectFound[x][y+1]) {
+//                        drawBlock(mmPicture, blockSize, x, y+1, colorBlue);
+//                    }
+//                    // South edge
+//                    if (!objectFound[x-1][y]) {
+//                        drawBlock(mmPicture, blockSize, x-1, y, colorGreen);
+//                    }
                 }
+
+                //                // Check if object is present west
+//                if (x > 1) {
+//                    if (objectFound[x-1][y-1]) {
+//                        drawBlock(mmPicture, blockSize, x-1, y, colorGreen);
+//                    }
+//                }
             }
         }
 

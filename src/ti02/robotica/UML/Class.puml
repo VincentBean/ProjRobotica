@@ -7,9 +7,13 @@ skinparam {
     'monospace reverse
 }
 
+class MMSorter {
+
+}
+
 class Object {
     - Properties : Map<String, DetectorResult>
-    - Bounds : Bounds
+'    - Bounds : Bounds
     - Pixels : int[][]
     + RunDetectors()
 }
@@ -38,37 +42,45 @@ class Camera {
     + getFrame() : Picture
 }
 
+class HardwareController {
+    + rotateCarousel() : void
+    + openGate(n) : void
+    + closeGate(n) : void
+}
+
 interface Detector {
     detect() : DetectorResult
 }
 
-interface PictureDetector implements Detector {
+'interface PictureDetector implements Detector {
+'
+'}
 
-}
+'interface ObjectDetector implements Detector {
+'
+'}
 
-interface ObjectDetector implements Detector {
-
-}
-
-class MMDetector implements PictureDetector {
+class MMDetector implements Detector {
     + detect() : DetectorResult<List<Object>>
 }
 
-class ColorDetector implements ObjectDetector {
+class ColorDetector implements Detector {
     + detect() : DetectorResult<Color>
 }
 
-class BoundsDetector implements ObjectDetector {
-    + detect() : DetectorResult<Bounds>
-}
+'class BoundsDetector implements Detector {
+'    + detect() : DetectorResult<Bounds>
+'}
 
 class DetectorResult<T> {
     - Result : T
 }
 
+MMSorter "1" -- "2" Detector
+MMSorter "1" -- "1" Picture
+MMSorter "1" -- "1" HardwareController
 
 'Picture --* Camera
-
 
 'Picture "1" -- "*" Detector
 Picture "1" -- "*" Object
