@@ -83,25 +83,24 @@ public class PictureProcessor {
             }
 
             // Find matching Enum color
-            ti02.robotica.Enums.Color convertedColor = colorDetector.convertColor(average, 15);
-            CurrentLogger.Logger.Info(convertedColor + ", " + nullCount);
+            ti02.robotica.Enums.Color convertedColor = colorDetector.convertColor(average, 100);
 
             // Open matching gate
             if (convertedColor != null) {
+                System.out.println(convertedColor + ", " + nullCount);
                 nullCount = 0;          // Color found, reset null counter
-                System.out.printf("Opening gate %d\n", convertedColor.ordinal());
-                Controller.OpenGate(convertedColor.ordinal());
+//                Controller.OpenGate(convertedColor.ordinal());
             } else {
                 nullCount++;            // 'Null' found, increment count
 
-                if (nullCount >= 25) {  // If no color has been found after 25 frames
-                    nullCount = 0;
-                    Controller.Feed();  // Rotate carousel
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                    }
-                }
+//                if (nullCount >= 25) {  // If no color has been found after 25 frames
+//                    nullCount = 0;
+//                    Controller.Feed();  // Rotate carousel
+////                    try {
+////                        Thread.sleep(1000);
+////                    } catch (InterruptedException e) {
+////                    }
+//                }
             }
         }
 

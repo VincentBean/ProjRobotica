@@ -4,15 +4,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class ConsoleLogger implements ILogger {
-
     @Override
     public void Debug(String msg) {
-        write(msg);
+//        write(msg);
     }
 
     @Override
     public void Info(String msg) {
-        write(msg);
+//        write(msg);
     }
 
     @Override

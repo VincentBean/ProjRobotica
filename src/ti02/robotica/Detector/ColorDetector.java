@@ -10,11 +10,11 @@ import java.util.ArrayList;
 public class ColorDetector implements IDetector {
     // Colors to detect
     final java.awt.Color colorBlue = new java.awt.Color(9, 74, 177);
-    final java.awt.Color colorBrown = new java.awt.Color(33, 30, 34);
-    final java.awt.Color colorGreen = new java.awt.Color(84, 160, 8);
-    final java.awt.Color colorOrange = new java.awt.Color(10, 8, 6);
-    final java.awt.Color colorRed = new java.awt.Color(196, 40, 73);
-    final java.awt.Color colorYellow = new java.awt.Color(196, 167, 6);
+    final java.awt.Color colorBrown = new java.awt.Color(78, 13, 5);
+    final java.awt.Color colorGreen = new java.awt.Color(98, 180, 9);
+    final java.awt.Color colorOrange = new java.awt.Color(217, 84, 14);
+    final java.awt.Color colorRed = new java.awt.Color(198, 42, 76);
+    final java.awt.Color colorYellow = new java.awt.Color(243, 226, 7);
     final java.awt.Color colorBlack = new java.awt.Color(0, 0, 0);
 
     @Override
@@ -74,9 +74,9 @@ public class ColorDetector implements IDetector {
         else if (compareColors(inputColor, colorGreen, margin)) {
             return Color.GREEN;
         }
-//        else if (compareColors(inputColor, colorOrange, margin)) {
-//            return Color.ORANGE;
-//        }
+        else if (compareColors(inputColor, colorOrange, margin)) {
+            return Color.ORANGE;
+        }
         else if (compareColors(inputColor, colorRed, margin)) {
             return Color.RED;
         }
