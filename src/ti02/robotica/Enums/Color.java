@@ -1,9 +1,10 @@
 package ti02.robotica.Enums;
 
 public enum Color {
-    RED,
-    GREEN,
-    YELLOW,
+    BLUE,
     BROWN,
-    BLUE
+    GREEN,
+    ORANGE,
+    RED,
+    YELLOW
 }

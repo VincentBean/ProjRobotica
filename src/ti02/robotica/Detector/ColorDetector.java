@@ -1,6 +1,7 @@
 package ti02.robotica.Detector;
 
 import ti02.robotica.Enums.Color;
+import ti02.robotica.Logging.CurrentLogger;
 import ti02.robotica.Models.DetectorResult;
 import ti02.robotica.Models.Object;
 
@@ -8,11 +9,13 @@ import java.util.ArrayList;
 
 public class ColorDetector implements IDetector {
     // Colors to detect
-    final java.awt.Color colorRed = new java.awt.Color(255, 0, 0);
-    final java.awt.Color colorGreen = new java.awt.Color(0, 255, 0);
-    final java.awt.Color colorBlue = new java.awt.Color(0, 0, 255);
+    final java.awt.Color colorBlue = new java.awt.Color(9, 74, 177);
+    final java.awt.Color colorBrown = new java.awt.Color(33, 30, 34);
+    final java.awt.Color colorGreen = new java.awt.Color(84, 160, 8);
+    final java.awt.Color colorOrange = new java.awt.Color(10, 8, 6);
+    final java.awt.Color colorRed = new java.awt.Color(196, 40, 73);
+    final java.awt.Color colorYellow = new java.awt.Color(196, 167, 6);
     final java.awt.Color colorBlack = new java.awt.Color(0, 0, 0);
-
 
     @Override
     public DetectorResult<Color> detect() {
@@ -37,28 +40,48 @@ public class ColorDetector implements IDetector {
     }
 
     // Calculate average color
-    public java.awt.Color detectColor(Object object) {
+    public java.awt.Color detectColor(ti02.robotica.Models.Object object) {
         java.awt.Color average = null;
 
         for (java.awt.Color[] xResult : object.getPixels()) {
             for (java.awt.Color yResult : xResult) {
-                if (average == null) {
-                    average = yResult;
-                }
+                if (yResult != null) {
+                    if (average == null) {
+                        average = yResult;
+                    }
 
-                average = new java.awt.Color(
-                        (int)incrementalAverage(average.getRed(), yResult.getRed()),
-                        (int)incrementalAverage(average.getGreen(), yResult.getGreen()),
-                        (int)incrementalAverage(average.getBlue(), yResult.getBlue()));
+                    average = new java.awt.Color(
+                            (int)incrementalAverage(average.getRed(), yResult.getRed()),
+                            (int)incrementalAverage(average.getGreen(), yResult.getGreen()),
+                            (int)incrementalAverage(average.getBlue(), yResult.getBlue()));
+                }
             }
         }
 
+//        CurrentLogger.Logger.Info(average + "");
+
+        return average;
+    }
+
+    public ti02.robotica.Enums.Color convertColor(java.awt.Color inputColor, int margin) {
         // Compare colors
-        if (compareColors(average, colorRed, 10)) {
-            return colorRed;
+        if (compareColors(inputColor, colorBlue, margin)) {
+            return Color.BLUE;
         }
-        else if (compareColors(average, colorGreen, 10)) {
-            return colorGreen;
+        else if (compareColors(inputColor, colorBrown, margin)) {
+            return Color.BROWN;
+        }
+        else if (compareColors(inputColor, colorGreen, margin)) {
+            return Color.GREEN;
+        }
+//        else if (compareColors(inputColor, colorOrange, margin)) {
+//            return Color.ORANGE;
+//        }
+        else if (compareColors(inputColor, colorRed, margin)) {
+            return Color.RED;
+        }
+        else if (compareColors(inputColor, colorYellow, margin)) {
+            return Color.YELLOW;
         }
 
         return null;

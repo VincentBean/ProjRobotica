@@ -17,6 +17,26 @@ public class Bounds {
         this(0, 0, 0, 0);
     }
 
+    public void setNorth(int north) {
+        if (north >= 0)
+            North = north;
+    }
+
+    public void setEast(int east) {
+        if (east >= 0)
+            East = east;
+    }
+
+    public void setSouth(int south) {
+        if (south >= 0)
+            South = south;
+    }
+
+    public void setWest(int west) {
+        if (west >= 0)
+            West = west;
+    }
+
     public int getNorth() {
         return North;
     }

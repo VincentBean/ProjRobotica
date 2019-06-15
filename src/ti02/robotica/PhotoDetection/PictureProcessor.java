@@ -1,131 +1,118 @@
 package ti02.robotica.PhotoDetection;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import jssc.SerialPort;
+import ti02.robotica.Detector.BoundsDetector;
+import ti02.robotica.Detector.ColorDetector;
+import ti02.robotica.Detector.HardwareController;
 import ti02.robotica.Logging.ConsoleLogger;
 import ti02.robotica.Logging.CurrentLogger;
+import ti02.robotica.Models.Bounds;
 import ti02.robotica.Models.MMPicture;
 import ti02.robotica.Models.Pixel;
+import ti02.robotica.Models.Object;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class PictureProcessor {
+    private int nullCount = 0;
+    private HardwareController Controller;
+
+    public PictureProcessor() {
+        Controller = new HardwareController(SerialPort.BAUDRATE_115200,"/dev/ttyACM0");
+        Controller.Connect();
+    }
+
     public MMPicture findMM(BufferedImage source) {
+        MMPicture mmPicture = new MMPicture(source.getWidth(), source.getHeight());
 
         if (source == null) {
             CurrentLogger.Logger.Error("Source image is null!");
             return null;
         }
 
-        int blockSize = 16;     // Grootte van blur in pixels
+        BoundsDetector boundsDetector = new BoundsDetector();
+        ColorDetector colorDetector = new ColorDetector();
+        boundsDetector.setSource(source);
+        ArrayList<ti02.robotica.Models.Object> objects = boundsDetector.LocateObjects();
 
-        MMPicture mmPicture = new MMPicture(source.getWidth(), source.getHeight());
-        Boolean[][] objectFound = new Boolean[source.getWidth() / blockSize][source.getHeight() / blockSize];
+        // Show arrays for debugging
+        for (ti02.robotica.Models.Object object : objects) {
+            java.awt.Color[][] pixels = object.getPixels();
+            Bounds bounds = object.getBounds();
+//
+//            CurrentLogger.Logger.Debug("north="+bounds.getNorth() + ", east="+bounds.getEast() + ", south="+bounds.getSouth()+", west="+bounds.getWest());
+//
+//            for (int x = bounds.getWest(); x < bounds.getEast(); x++) {
+//                mmPicture.setPixel(x*10, bounds.getNorth()*10, Color.red.getRGB());
+////                mmPicture.setPixel(x*20, bounds.getSouth()*20, Color.green.getRGB());
+//            }
+//            for (int y = bounds.getNorth(); y < bounds.getSouth(); y++) {
+////                mmPicture.setPixel(bounds.getWest()*20, y*20, Color.red.getRGB());
+////                mmPicture.setPixel(bounds.getEast()*20, y*20, Color.green.getRGB());
+//            }
 
-        final int colorMM = 0x804b004b; // AARRGGBB
-        final int colorRed = 0x80FF0000;
-        final int colorGreen = 0x8000FF00;
-        final int colorBlue = 0x800000FF;
-        final int colorBlack = 0xFF000000;
-
-        double averageRed;
-        double averageGreen;
-        double averageBlue;
-
-        // Deel breedte van beeld op in blokken
-        for (int Xblock = 0; Xblock <= source.getWidth() - blockSize; Xblock += blockSize)
-        {
-            // Deel hoogte van beeld op in blokken
-            for (int Yblock = 0; Yblock <= source.getHeight() - blockSize; Yblock += blockSize)
-            {
-                // Reset gemiddelde kleur bij het aankomen van een nieuwe block
-                Color color = new Color(source.getRGB(Xblock, Yblock));
-                averageRed = (double)color.getRed();
-                averageGreen = (double)color.getGreen();
-                averageBlue = (double)color.getBlue();
-
-                // Ga door alle pixels heen in een blok
-                for (int Xlocal = Xblock; Xlocal < Xblock + blockSize; Xlocal++)
-                {
-                    for (int Ylocal = Yblock; Ylocal < Yblock + blockSize; Ylocal++)
-                    {
-                        // Bereken gemiddelde kleur
-                        color = new Color(source.getRGB(Xlocal, Ylocal));
-
-                        averageRed = incrementalAverage(averageRed, (double)color.getRed());
-                        averageGreen = incrementalAverage(averageGreen, (double)color.getGreen());
-                        averageBlue = incrementalAverage(averageBlue, (double)color.getBlue());
-                    }
-                }
-
-                // Bepaal of er een object aanwezig is in dit blok
-                if (averageRed >= 5 && averageGreen >= 5 && averageBlue >= 5) {
-                    objectFound[Xblock / blockSize][Yblock / blockSize] = true;
-                } else {
-                    objectFound[Xblock / blockSize][Yblock / blockSize] = false;
-                }
-            }
+//            for (int x = 0; x < pixels.length; x++) {
+//                for (int y = 0; y < pixels[x].length; y++) {
+//                    if (pixels[x][y] != null) {
+////                        System.out.print("....");
+//
+//                    } else {
+////                        System.out.print(pixels[x][y].getRGB());
+//                    }
+//
+////                    System.out.print("\t");
+//                }
+////                System.out.print("\n");
+//            }
+////            System.out.print("\n\n\n");
         }
 
-        // Ga door alle blokken heen
-        int x = 0;
-        int y;
 
-        for (Boolean[] xResult : objectFound)
-        {
-            y = 0;
-            x++;
+        Color average = null;
+        for (ti02.robotica.Models.Object object : objects) {
+            Color colorResult = colorDetector.detectColor(object);
 
-            for (Boolean yResult : xResult)
-            {
-                y++;
+            // Set color for first time
+            if (average == null) {
+                average = colorResult;
+                continue;
+            }
 
-//                CurrentLogger.Logger.Info("X="+x+", Y="+y);
+            // Calculate average
+            average = new java.awt.Color(
+                    (int)incrementalAverage(average.getRed(), colorResult.getRed()),
+                    (int)incrementalAverage(average.getGreen(), colorResult.getGreen()),
+                    (int)incrementalAverage(average.getBlue(), colorResult.getBlue()));
+        }
 
-//              // Wanneer er een object aanwezig is
-                if (yResult)
-                {
-                    drawBlock(mmPicture, blockSize, x, y, colorBlack);
+//        CurrentLogger.Logger.Debug(average.toString());
 
-//                    // North edge
-//                    if (!objectFound[x][y-1]) {
-//                        drawBlock(mmPicture, blockSize, x, y-1, colorRed);
-//                    }
-//                    // South edge
-//                    if (!objectFound[x][y+1]) {
-//                        drawBlock(mmPicture, blockSize, x, y+1, colorBlue);
-//                    }
-//                    // South edge
-//                    if (!objectFound[x-1][y]) {
-//                        drawBlock(mmPicture, blockSize, x-1, y, colorGreen);
-//                    }
-                }
 
-                //                // Check if object is present west
-//                if (x > 1) {
-//                    if (objectFound[x-1][y-1]) {
-//                        drawBlock(mmPicture, blockSize, x-1, y, colorGreen);
-//                    }
-//                }
+        ti02.robotica.Enums.Color converted = colorDetector.convertColor(average, 15);
+
+
+        CurrentLogger.Logger.Info(converted + ", "+nullCount);
+        if (converted != null) {
+            nullCount = 0;
+            System.out.printf("Opening gate %d\n", converted.ordinal());
+            Controller.OpenGate(converted.ordinal());
+        } else {
+            nullCount++;
+            if (nullCount >= 25) {
+                nullCount = 0;
+                Controller.Feed();
+                try {
+                    Thread.sleep(1000);
+                } catch( InterruptedException e){}
             }
         }
 
         return mmPicture;
-    }
-
-    void drawBlock(MMPicture mmPicture, int blockSize, int x, int y, int color) {
-        // Kleur hele blok in
-        for (int xkwadraat = x * blockSize - blockSize; xkwadraat < (x*blockSize); xkwadraat++)
-        {
-            for (int ykwadraat = y * blockSize - blockSize; ykwadraat < (y*blockSize); ykwadraat++)
-            {
-//                            CurrentLogger.Logger.Info("Xkwadraat="+xkwadraat+", Ykwadraat="+ykwadraat);
-                mmPicture.setPixel(xkwadraat, ykwadraat, color);
-
-            }
-        }
     }
 
     // Bereken gemiddelde - https://stackoverflow.com/a/16757630

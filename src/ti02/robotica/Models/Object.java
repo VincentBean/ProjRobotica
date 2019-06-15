@@ -3,16 +3,37 @@ package ti02.robotica.Models;
 import ti02.robotica.Detector.IDetector;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Object {
     private java.awt.Color[][] pixels;
+    private int boundNorth, boundSouth, boundWest, boundEast;
+    private Bounds bounds;
 
-    public java.awt.Color[][] getPixels() {
-        return pixels;
+    public Bounds getBounds() {
+        return bounds;
+    }
+
+    public void setBounds(Bounds bounds) {
+        this.bounds = bounds;
     }
 
     private Map<String, DetectorResult> Properties;
+
+    public Object(Color[][] pixels) {
+        this.pixels = pixels;
+    }
+
+    public Object(int width, int height) {
+        this.pixels = new java.awt.Color[width][height];
+    }
+
+    public void RunDetector(IDetector detector) {
+        DetectorResult result = detector.detect();
+
+        Properties.put(detector.toString(), result);
+    }
 
     public void setPixels(Color[][] pixels) {
         this.pixels = pixels;
@@ -22,11 +43,7 @@ public class Object {
         this.pixels[x][y] = pixel;
     }
 
-    public void RunDetector(IDetector detector) {
-        DetectorResult result = detector.detect();
-
-        Properties.put(detector.toString(), result);
+    public java.awt.Color[][] getPixels() {
+        return pixels;
     }
-
-
 }

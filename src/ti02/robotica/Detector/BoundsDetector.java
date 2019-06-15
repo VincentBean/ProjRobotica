@@ -9,6 +9,7 @@ import ti02.robotica.Models.Object;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BoundsDetector implements IDetector {
     private BufferedImage source;
@@ -35,24 +36,22 @@ public class BoundsDetector implements IDetector {
         return name.replace("Detector", "");
     }
 
-    public int LocateObjects() {
-        ArrayList objects = new ArrayList<Object>();
+    public void setSource(BufferedImage source) {
+        this.source = source;
+    }
+
+    public ArrayList<ti02.robotica.Models.Object> LocateObjects() {
+        ArrayList objects = new ArrayList<ti02.robotica.Models.Object>();
 
         if (source == null) {
             CurrentLogger.Logger.Error("Source image is null!");
-            return -1;
+            return null;
         }
 
-        int blockSize = 8;     // Grootte van blur in pixels
+        int blockSize = 20;     // Grootte van blur in pixels
 
         MMPicture mmPicture = new MMPicture(source.getWidth(), source.getHeight());
         Boolean[][] objectFound = new Boolean[source.getWidth() / blockSize][source.getHeight() / blockSize];
-
-        final int colorMM = 0x804b004b; // AARRGGBB
-        final int colorRed = 0x80FF0000;
-        final int colorGreen = 0x8000FF00;
-        final int colorBlue = 0x800000FF;
-        final int colorBlack = 0xFF000000;
 
         double averageRed;
         double averageGreen;
@@ -71,19 +70,19 @@ public class BoundsDetector implements IDetector {
                 averageGreen = (double)color.getGreen();
                 averageBlue = (double)color.getBlue();
 
-                // Ga door alle pixels heen in een blok
-                for (int Xlocal = Xblock; Xlocal < Xblock + blockSize; Xlocal++)
-                {
-                    for (int Ylocal = Yblock; Ylocal < Yblock + blockSize; Ylocal++)
-                    {
-                        // Bereken gemiddelde kleur
-                        color = new Color(source.getRGB(Xlocal, Ylocal));
-//
-//                        averageRed = incrementalAverage(averageRed, (double)color.getRed());
-//                        averageGreen = incrementalAverage(averageGreen, (double)color.getGreen());
-//                        averageBlue = incrementalAverage(averageBlue, (double)color.getBlue());
-                    }
-                }
+//                // Ga door alle pixels heen in een blok
+//                for (int Xlocal = Xblock; Xlocal < Xblock + blockSize; Xlocal++)
+//                {
+//                    for (int Ylocal = Yblock; Ylocal < Yblock + blockSize; Ylocal++)
+//                    {
+//                        // Bereken gemiddelde kleur
+//                        color = new Color(source.getRGB(Xlocal, Ylocal));
+////
+////                        averageRed = incrementalAverage(averageRed, (double)color.getRed());
+////                        averageGreen = incrementalAverage(averageGreen, (double)color.getGreen());
+////                        averageBlue = incrementalAverage(averageBlue, (double)color.getBlue());
+//                    }
+//                }
 
                 // Bepaal of er een object aanwezig is in dit blok
                 if (averageRed >= 5 && averageGreen >= 5 && averageBlue >= 5) {
@@ -100,25 +99,84 @@ public class BoundsDetector implements IDetector {
         //     - Check if object is present in all four directions, and color is not null
         //         Add blocks to object, set color of this block to null
 
-        // Deel breedte van beeld op in blokken
-        for (int Xblock = 0; Xblock <= source.getWidth() - blockSize; Xblock += blockSize) {
+//        CurrentLogger.Logger.Info("WIDTH="+ source.getWidth() + ", HEIGHT="+ source.getHeight());
+//        CurrentLogger.Logger.Info("objectFound width="+ objectFound.length + ", objectFound height="+ objectFound[0].length);
 
-            // Deel hoogte van beeld op in blokken
-            for (int Yblock = 0; Yblock <= source.getHeight() - blockSize; Yblock += blockSize) {
-                if (objectFound[Xblock / blockSize][Yblock / blockSize] == true) {
-                    objectFound[Xblock / blockSize][Yblock / blockSize] = null;
-                    
+//        for (int x = 0; x < objectFound.length; x++) {
+//            for (int y = 0; y < objectFound[x].length; y++) {
+//                if (objectFound[x][y]) {
+//                    System.out.print("MMMM");
+//                } else {
+//                    System.out.print("....");
+//                }
+//            }
+//            System.out.print("\n");
+//        }
+
+        for (int x = 0; x < objectFound.length; x++) {
+            for (int y = 0; y < objectFound[x].length; y++) {
+//                CurrentLogger.Logger.Info("X = "+x+", Y="+y);
+                if (objectFound[x][y]) {
+                    // Create new M&M
+                    Bounds bounds = new Bounds(y, x, y, x);
+                    ti02.robotica.Models.Object mm = CheckNeighboringPixels(blockSize, new ti02.robotica.Models.Object(source.getWidth(), source.getHeight()), objectFound, x, y, bounds);
+
+                    objects.add(mm);
                 }
             }
         }
 
+//        CurrentLogger.Logger.Info("==> Found " + objects.size() + " objects.");
+        return objects;  // Return the amount of found objects
+    }
 
+    private ti02.robotica.Models.Object CheckNeighboringPixels(int blockSize, ti02.robotica.Models.Object mm, Boolean[][] objectFound, int x, int y, Bounds bounds) {
+        objectFound[x][y] = false;
 
-        //    // Wanneer M&M gevonden is:
-        //    Object mm = new Object();
-        //    mm.setPixels();
-        //    objects.add(mm);
+        // Add pixel to object
+        mm.setPixel(new Color(source.getRGB(x * blockSize, y * blockSize)), x, y);
 
-        return objects.size();  // Return the amount of found objects
+        // North neighbour
+        try {
+            if (objectFound[x][y - 1]) {
+                bounds.setNorth(bounds.getNorth() - 1);
+                CheckNeighboringPixels(blockSize, mm, objectFound, x, y - 1, bounds);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+
+        }
+
+        // East neighbour
+        try {
+            if (objectFound[x + 1][y]) {
+                bounds.setEast(bounds.getEast() + 1);
+                CheckNeighboringPixels(blockSize, mm, objectFound, x + 1, y, bounds);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+
+        }
+
+        // South neightbour
+        try {
+            if (objectFound[x][y + 1]) {
+                bounds.setSouth(bounds.getSouth() + 1);
+                CheckNeighboringPixels(blockSize, mm, objectFound, x, y + 1, bounds);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+
+        }
+
+        // West neighbour
+        try {
+            if (objectFound[x - 1][y]) {
+                bounds.setWest(bounds.getWest() - 1);
+                CheckNeighboringPixels(blockSize, mm, objectFound, x - 1, y, bounds);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+
+        }
+
+        mm.setBounds(bounds);
+        return mm;
     }
 }
