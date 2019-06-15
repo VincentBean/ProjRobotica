@@ -121,7 +121,9 @@ public class BoundsDetector implements IDetector {
                     Bounds bounds = new Bounds(y, x, y, x);
                     ti02.robotica.Models.Object mm = CheckNeighboringPixels(blockSize, new ti02.robotica.Models.Object(source.getWidth(), source.getHeight()), objectFound, x, y, bounds);
 
-                    objects.add(mm);
+                    // TODO: discard smaller objects (opposite bounds are closer)
+
+                    objects.add(mm);    // Add object to list of found objects
                 }
             }
         }
@@ -137,43 +139,35 @@ public class BoundsDetector implements IDetector {
         mm.setPixel(new Color(source.getRGB(x * blockSize, y * blockSize)), x, y);
 
         // North neighbour
-        try {
+        if ((bounds.getNorth() - 1)*blockSize >= 0) {
             if (objectFound[x][y - 1]) {
                 bounds.setNorth(bounds.getNorth() - 1);
                 CheckNeighboringPixels(blockSize, mm, objectFound, x, y - 1, bounds);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-
         }
 
         // East neighbour
-        try {
+        if ((bounds.getEast() + 1)*blockSize < source.getWidth()) {
             if (objectFound[x + 1][y]) {
                 bounds.setEast(bounds.getEast() + 1);
                 CheckNeighboringPixels(blockSize, mm, objectFound, x + 1, y, bounds);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-
         }
 
         // South neightbour
-        try {
+        if ((bounds.getSouth() + 1)*blockSize < source.getHeight()) {
             if (objectFound[x][y + 1]) {
                 bounds.setSouth(bounds.getSouth() + 1);
                 CheckNeighboringPixels(blockSize, mm, objectFound, x, y + 1, bounds);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-
         }
 
         // West neighbour
-        try {
+        if ((bounds.getWest() - 1)*blockSize >= 0) {
             if (objectFound[x - 1][y]) {
                 bounds.setWest(bounds.getWest() - 1);
                 CheckNeighboringPixels(blockSize, mm, objectFound, x - 1, y, bounds);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-
         }
 
         mm.setBounds(bounds);

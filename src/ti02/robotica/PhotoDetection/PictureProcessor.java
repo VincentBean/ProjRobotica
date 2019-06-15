@@ -42,40 +42,13 @@ public class PictureProcessor {
 
         // Show arrays for debugging
         for (ti02.robotica.Models.Object object : objects) {
-            java.awt.Color[][] pixels = object.getPixels();
-            Bounds bounds = object.getBounds();
-//
-//            CurrentLogger.Logger.Debug("north="+bounds.getNorth() + ", east="+bounds.getEast() + ", south="+bounds.getSouth()+", west="+bounds.getWest());
-//
-//            for (int x = bounds.getWest(); x < bounds.getEast(); x++) {
-//                mmPicture.setPixel(x*10, bounds.getNorth()*10, Color.red.getRGB());
-////                mmPicture.setPixel(x*20, bounds.getSouth()*20, Color.green.getRGB());
-//            }
-//            for (int y = bounds.getNorth(); y < bounds.getSouth(); y++) {
-////                mmPicture.setPixel(bounds.getWest()*20, y*20, Color.red.getRGB());
-////                mmPicture.setPixel(bounds.getEast()*20, y*20, Color.green.getRGB());
-//            }
-
-//            for (int x = 0; x < pixels.length; x++) {
-//                for (int y = 0; y < pixels[x].length; y++) {
-//                    if (pixels[x][y] != null) {
-////                        System.out.print("....");
-//
-//                    } else {
-////                        System.out.print(pixels[x][y].getRGB());
-//                    }
-//
-////                    System.out.print("\t");
-//                }
-////                System.out.print("\n");
-//            }
-////            System.out.print("\n\n\n");
         }
 
 
         Color average = null;
+        // Go through all found objects
         for (ti02.robotica.Models.Object object : objects) {
-            Color colorResult = colorDetector.detectColor(object);
+            Color colorResult = colorDetector.detectColor(object);  // Get average color of object
 
             // Set color for first time
             if (average == null) {
@@ -83,18 +56,35 @@ public class PictureProcessor {
                 continue;
             }
 
-            // Calculate average
+            // Calculate average of all objects
             average = new java.awt.Color(
                     (int)incrementalAverage(average.getRed(), colorResult.getRed()),
                     (int)incrementalAverage(average.getGreen(), colorResult.getGreen()),
                     (int)incrementalAverage(average.getBlue(), colorResult.getBlue()));
+
+            // Draw bounds for debugging
+            java.awt.Color[][] pixels = object.getPixels();
+            Bounds bounds = object.getBounds();
+
+            CurrentLogger.Logger.Debug("north="+bounds.getNorth() + ", east="+bounds.getEast() + ", south="+bounds.getSouth()+", west="+bounds.getWest());
+
+            // TODO: replace hardcoded value for 'blockSize'
+            // Draw west and east bounds
+            for (int x = bounds.getWest()*20; x < bounds.getEast()*20; x++) {
+                mmPicture.setPixel(x, bounds.getSouth()*20, colorResult.getRGB());
+                mmPicture.setPixel(x, bounds.getNorth()*20, colorResult.getRGB());
+            }
+
+            // Draw north and south bounds
+            for (int y = bounds.getNorth()*20; y < bounds.getSouth()*20; y++) {
+                mmPicture.setPixel(bounds.getWest()*20, y, colorResult.getRGB());
+                mmPicture.setPixel(bounds.getEast()*20, y, colorResult.getRGB());
+            }
+
         }
 
-//        CurrentLogger.Logger.Debug(average.toString());
-
-
+        // Find matching Enum color
         ti02.robotica.Enums.Color converted = colorDetector.convertColor(average, 15);
-
 
         CurrentLogger.Logger.Info(converted + ", "+nullCount);
         if (converted != null) {
