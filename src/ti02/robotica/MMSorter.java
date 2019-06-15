@@ -21,8 +21,7 @@ import com.xuggle.xuggler.IError;
 import com.xuggle.xuggler.demos.VideoImage;
 
 public class MMSorter {
-    private static VideoImage mScreenProcessed = null;
-    private static VideoImage mScreenSource = null;
+    private static VideoImage mScreen = null;
     private static Camera camera;
     private static PictureProcessor pictureProcessor;
     private static long previousTimestamp = System.currentTimeMillis();
@@ -76,9 +75,6 @@ public class MMSorter {
 
     private static void updateJavaWindow(BufferedImage inputImage)
     {
-        mScreenSource.setImage(inputImage);
-        mScreenSource.setLocation(inputImage.getWidth(),0);
-
         MMPicture mmPicture = pictureProcessor.findMM(inputImage);
 
 //        CurrentLogger.Logger.Info(mmPicture.getPixelCount() + "");
@@ -86,7 +82,8 @@ public class MMSorter {
         MMPictureRenderer renderer = new MMPictureRenderer();
 
         BufferedImage processed = renderer.render(mmPicture);
-        mScreenProcessed.setImage(processed);
+
+        mScreen.setImage(ImageUtil.Combine(inputImage, processed));
 
 //        CurrentLogger.Logger.Info(1000/(System.currentTimeMillis() - previousTimestamp) +" fps");
         previousTimestamp = System.currentTimeMillis();
@@ -97,8 +94,7 @@ public class MMSorter {
      */
     private static void openJavaWindow()
     {
-        mScreenProcessed = new VideoImage();
-        mScreenSource = new VideoImage();
+        mScreen = new VideoImage();
     }
 
     /**
