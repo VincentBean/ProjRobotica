@@ -47,7 +47,7 @@ public class MMSorter {
 //        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov");
         IMediaReader mediaReader = ToolFactory.makeReader("input/mms_v2.mp4");
 //        IMediaReader mediaReader = ToolFactory.makeReader("input/mm_oranje.png");
-        IMediaReader mediaReader = ToolFactory.makeReader("input/mm_rood.png");
+//        IMediaReader mediaReader = ToolFactory.makeReader("input/mm_rood.png");
 
 //        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://raspberrypi.local:8554/test.sdp");
 //        $ raspivid -o - -t 0 -hf -w 640 -h 360 -fps 25 | cvlc -vvv stream:///dev/stdin --sout '#rtp{sdp=rtsp://127.0.0.1:8554/test.sdp}' :demux=h264

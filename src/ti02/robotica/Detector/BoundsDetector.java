@@ -93,33 +93,14 @@ public class BoundsDetector implements IDetector {
             }
         }
 
-        // Iterate through all blocks
-        // When object is present (objectFound[Xblock / blockSize][Yblock / blockSize] == true), and color is not null
-        //     - Add this block to a new object, set color of this block to null
-        //     - Check if object is present in all four directions, and color is not null
-        //         Add blocks to object, set color of this block to null
-
-//        CurrentLogger.Logger.Info("WIDTH="+ source.getWidth() + ", HEIGHT="+ source.getHeight());
-//        CurrentLogger.Logger.Info("objectFound width="+ objectFound.length + ", objectFound height="+ objectFound[0].length);
-
-//        for (int x = 0; x < objectFound.length; x++) {
-//            for (int y = 0; y < objectFound[x].length; y++) {
-//                if (objectFound[x][y]) {
-//                    System.out.print("MMMM");
-//                } else {
-//                    System.out.print("....");
-//                }
-//            }
-//            System.out.print("\n");
-//        }
-
+        // Iiterate through blocks and check if neighboring blocks also contain an object
         for (int x = 0; x < objectFound.length; x++) {
             for (int y = 0; y < objectFound[x].length; y++) {
 //                CurrentLogger.Logger.Info("X = "+x+", Y="+y);
                 if (objectFound[x][y]) {
                     // Create new M&M
                     Bounds bounds = new Bounds(y, x, y, x);
-                    ti02.robotica.Models.Object mm = CheckNeighboringPixels(blockSize, new ti02.robotica.Models.Object(source.getWidth(), source.getHeight()), objectFound, x, y, bounds);
+                    ti02.robotica.Models.Object mm = CheckNeighboringBlocks(blockSize, new ti02.robotica.Models.Object(source.getWidth(), source.getHeight()), objectFound, x, y, bounds);
 
                     // TODO:
                     //  - discard smaller objects (opposite bounds are closer)
@@ -130,21 +111,23 @@ public class BoundsDetector implements IDetector {
             }
         }
 
-//        CurrentLogger.Logger.Info("==> Found " + objects.size() + " objects.");
-        return objects;  // Return the amount of found objects
+        CurrentLogger.Logger.Info("==> Found " + objects.size() + " objects.");
+        return objects;  // Return the found objects
     }
 
-    private ti02.robotica.Models.Object CheckNeighboringPixels(int blockSize, ti02.robotica.Models.Object mm, Boolean[][] objectFound, int x, int y, Bounds bounds) {
+    // Check if the neighboring blocks also contain an object
+    private ti02.robotica.Models.Object CheckNeighboringBlocks(int blockSize, ti02.robotica.Models.Object mm, Boolean[][] objectFound, int x, int y, Bounds bounds) {
+        // Mark this block as 'not an object' so this block will be ignored in future checks
         objectFound[x][y] = false;
 
         // Add pixel to object
         mm.setPixel(new Color(source.getRGB(x * blockSize, y * blockSize)), x, y);
 
         // North neighbour
-        if ((bounds.getNorth() - 1)*blockSize >= 0) {
-            if (objectFound[x][y - 1]) {
-                bounds.setNorth(bounds.getNorth() - 1);
-                CheckNeighboringPixels(blockSize, mm, objectFound, x, y - 1, bounds);
+        if ((bounds.getNorth() - 1)*blockSize >= 0) {                   // Check if new bound would be inside range of source
+            if (objectFound[x][y - 1]) {                                // Check if there is an object in the block north of current block
+                bounds.setNorth(bounds.getNorth() - 1);                 // Increment the bound
+                CheckNeighboringBlocks(blockSize, mm, objectFound, x, y - 1, bounds);   // Do the same checks for the neighboring blocks
             }
         }
 
@@ -152,7 +135,7 @@ public class BoundsDetector implements IDetector {
         if ((bounds.getEast() + 1)*blockSize < source.getWidth()) {
             if (objectFound[x + 1][y]) {
                 bounds.setEast(bounds.getEast() + 1);
-                CheckNeighboringPixels(blockSize, mm, objectFound, x + 1, y, bounds);
+                CheckNeighboringBlocks(blockSize, mm, objectFound, x + 1, y, bounds);
             }
         }
 
@@ -160,7 +143,7 @@ public class BoundsDetector implements IDetector {
         if ((bounds.getSouth() + 1)*blockSize < source.getHeight()) {
             if (objectFound[x][y + 1]) {
                 bounds.setSouth(bounds.getSouth() + 1);
-                CheckNeighboringPixels(blockSize, mm, objectFound, x, y + 1, bounds);
+                CheckNeighboringBlocks(blockSize, mm, objectFound, x, y + 1, bounds);
             }
         }
 
@@ -168,7 +151,7 @@ public class BoundsDetector implements IDetector {
         if ((bounds.getWest() - 1)*blockSize >= 0) {
             if (objectFound[x - 1][y]) {
                 bounds.setWest(bounds.getWest() - 1);
-                CheckNeighboringPixels(blockSize, mm, objectFound, x - 1, y, bounds);
+                CheckNeighboringBlocks(blockSize, mm, objectFound, x - 1, y, bounds);
             }
         }
 

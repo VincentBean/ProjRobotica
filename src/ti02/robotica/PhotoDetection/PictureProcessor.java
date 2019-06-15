@@ -40,11 +40,6 @@ public class PictureProcessor {
         boundsDetector.setSource(source);
         ArrayList<ti02.robotica.Models.Object> objects = boundsDetector.LocateObjects();
 
-        // Show arrays for debugging
-        for (ti02.robotica.Models.Object object : objects) {
-        }
-
-
         Color average = null;
         // Go through all found objects
         for (ti02.robotica.Models.Object object : objects) {
@@ -84,14 +79,14 @@ public class PictureProcessor {
         }
 
         // Find matching Enum color
-        ti02.robotica.Enums.Color converted = colorDetector.convertColor(average, 15);
-        CurrentLogger.Logger.Info(converted + ", " + nullCount);
+        ti02.robotica.Enums.Color convertedColor = colorDetector.convertColor(average, 15);
+        CurrentLogger.Logger.Info(convertedColor + ", " + nullCount);
 
         // Open matching gate
-        if (converted != null) {
+        if (convertedColor != null) {
             nullCount = 0;          // Color found, reset null counter
-            System.out.printf("Opening gate %d\n", converted.ordinal());
-            Controller.OpenGate(converted.ordinal());
+            System.out.printf("Opening gate %d\n", convertedColor.ordinal());
+            Controller.OpenGate(convertedColor.ordinal());
         } else {
             nullCount++;            // 'Null' found, increment count
 
