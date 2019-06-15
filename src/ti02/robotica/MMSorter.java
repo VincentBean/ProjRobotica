@@ -45,7 +45,7 @@ public class MMSorter {
         pictureProcessor = new PictureProcessor();
 
 //        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov");
-//        IMediaReader mediaReader = ToolFactory.makeReader("input/mms.mp4");
+        IMediaReader mediaReader = ToolFactory.makeReader("input/mms_v2.mp4");
 //        IMediaReader mediaReader = ToolFactory.makeReader("input/mm_oranje.png");
         IMediaReader mediaReader = ToolFactory.makeReader("input/mm_rood.png");
 
@@ -69,7 +69,9 @@ public class MMSorter {
                 break;
             }
         }
-        closeJavaWindow();
+
+        // Commented out to keep window open when input stream ends
+//        closeJavaWindow();
     }
 
     private static void updateJavaWindow(BufferedImage inputImage)
@@ -105,6 +107,6 @@ public class MMSorter {
      */
     private static void closeJavaWindow()
     {
-//        System.exit(0);
+        System.exit(0);
     }
 }

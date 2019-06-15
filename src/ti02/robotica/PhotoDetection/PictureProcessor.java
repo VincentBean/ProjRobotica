@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class PictureProcessor {
-    private int nullCount = 0;
+    private int nullCount = 0;              // Amount of 'null' average colors
     private HardwareController Controller;
 
     public PictureProcessor() {
@@ -85,17 +85,19 @@ public class PictureProcessor {
 
         // Find matching Enum color
         ti02.robotica.Enums.Color converted = colorDetector.convertColor(average, 15);
+        CurrentLogger.Logger.Info(converted + ", " + nullCount);
 
-        CurrentLogger.Logger.Info(converted + ", "+nullCount);
+        // Open matching gate
         if (converted != null) {
-            nullCount = 0;
+            nullCount = 0;          // Color found, reset null counter
             System.out.printf("Opening gate %d\n", converted.ordinal());
             Controller.OpenGate(converted.ordinal());
         } else {
-            nullCount++;
-            if (nullCount >= 25) {
+            nullCount++;            // 'Null' found, increment count
+
+            if (nullCount >= 25) {  // If no color has been found after 25 frames
                 nullCount = 0;
-                Controller.Feed();
+                Controller.Feed();  // Rotate carousel
                 try {
                     Thread.sleep(1000);
                 } catch( InterruptedException e){}
@@ -105,7 +107,7 @@ public class PictureProcessor {
         return mmPicture;
     }
 
-    // Bereken gemiddelde - https://stackoverflow.com/a/16757630
+    // Calculate average - https://stackoverflow.com/a/16757630
     double incrementalAverage(double average, double new_value) {
         average -= average;
         average += new_value;

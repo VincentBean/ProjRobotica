@@ -121,7 +121,9 @@ public class BoundsDetector implements IDetector {
                     Bounds bounds = new Bounds(y, x, y, x);
                     ti02.robotica.Models.Object mm = CheckNeighboringPixels(blockSize, new ti02.robotica.Models.Object(source.getWidth(), source.getHeight()), objectFound, x, y, bounds);
 
-                    // TODO: discard smaller objects (opposite bounds are closer)
+                    // TODO:
+                    //  - discard smaller objects (opposite bounds are closer)
+                    //  - discard objects with an almost black or white average color
 
                     objects.add(mm);    // Add object to list of found objects
                 }
