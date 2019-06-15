@@ -10,13 +10,22 @@ public class Object {
     private java.awt.Color[][] pixels;
     private int boundNorth, boundSouth, boundWest, boundEast;
     private Bounds bounds;
+    private Color averageColor;
 
     public Bounds getBounds() {
         return bounds;
     }
 
+    public Color getAverageColor() {
+        return averageColor;
+    }
+
     public void setBounds(Bounds bounds) {
         this.bounds = bounds;
+    }
+
+    public void setAverageColor(Color averageColor) {
+        this.averageColor = averageColor;
     }
 
     private Map<String, DetectorResult> Properties;

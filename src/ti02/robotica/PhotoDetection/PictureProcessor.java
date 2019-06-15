@@ -42,9 +42,10 @@ public class PictureProcessor {
 
         Color average = null;
         // Go through all found objects
-        if (objects.size() >= 1) {  // Check if there's at least one object
+        if (objects.size() > 0) {  // Check if there's at least one object
             for (ti02.robotica.Models.Object object : objects) {
                 Color colorResult = colorDetector.detectColor(object);  // Get average color of object
+                object.setAverageColor(colorResult);
 
                 // Set color for first time
                 if (average == null) {
@@ -57,26 +58,28 @@ public class PictureProcessor {
                         (int) incrementalAverage(average.getRed(), colorResult.getRed()),
                         (int) incrementalAverage(average.getGreen(), colorResult.getGreen()),
                         (int) incrementalAverage(average.getBlue(), colorResult.getBlue()));
+            }
 
+            for (ti02.robotica.Models.Object object : objects) {
                 // Draw bounds for debugging
                 java.awt.Color[][] pixels = object.getPixels();
                 Bounds bounds = object.getBounds();
+                Color averageColor = object.getAverageColor();
 
                 CurrentLogger.Logger.Debug("north=" + bounds.getNorth() + ", east=" + bounds.getEast() + ", south=" + bounds.getSouth() + ", west=" + bounds.getWest());
 
                 // TODO: replace hardcoded value for 'blockSize'
                 // Draw west and east bounds
                 for (int x = bounds.getWest() * 20; x < bounds.getEast() * 20; x++) {
-                    mmPicture.setPixel(x, bounds.getSouth() * 20, colorResult.getRGB());
-                    mmPicture.setPixel(x, bounds.getNorth() * 20, colorResult.getRGB());
+                    mmPicture.setPixel(x, bounds.getSouth() * 20, averageColor.getRGB());
+                    mmPicture.setPixel(x, bounds.getNorth() * 20, averageColor.getRGB());
                 }
 
                 // Draw north and south bounds
                 for (int y = bounds.getNorth() * 20; y < bounds.getSouth() * 20; y++) {
-                    mmPicture.setPixel(bounds.getWest() * 20, y, colorResult.getRGB());
-                    mmPicture.setPixel(bounds.getEast() * 20, y, colorResult.getRGB());
+                    mmPicture.setPixel(bounds.getWest() * 20, y, averageColor.getRGB());
+                    mmPicture.setPixel(bounds.getEast() * 20, y, averageColor.getRGB());
                 }
-
             }
 
             // Find matching Enum color

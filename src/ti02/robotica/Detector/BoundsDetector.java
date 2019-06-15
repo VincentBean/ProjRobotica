@@ -99,12 +99,39 @@ public class BoundsDetector implements IDetector {
 //                CurrentLogger.Logger.Info("X = "+x+", Y="+y);
                 if (objectFound[x][y]) {
                     // Create new M&M
-                    Bounds bounds = new Bounds(y, x, y, x);
-                    ti02.robotica.Models.Object mm = CheckNeighboringBlocks(blockSize, new ti02.robotica.Models.Object(source.getWidth(), source.getHeight()), objectFound, x, y, bounds);
+                    ti02.robotica.Models.Object mm = CheckNeighboringBlocks(blockSize, new ti02.robotica.Models.Object(source.getWidth(), source.getHeight()), objectFound, x, y, new Bounds(y, x, y, x));
 
-                    // TODO:
-                    //  - discard smaller objects (opposite bounds are closer)
-                    //  - discard objects with an almost black or white average color
+                    Bounds bounds = mm.getBounds();
+
+                    // Discard small objects
+                    if (bounds.getSouth() - bounds.getNorth() < 3) {
+                        continue;
+                    }
+
+                    if (bounds.getEast() - bounds.getWest() < 3) {
+                        continue;
+                    }
+
+                    // Discard large objects
+                    if (bounds.getSouth() - bounds.getNorth() > 25) {
+                        continue;
+                    }
+
+                    if (bounds.getEast() - bounds.getWest() > 25) {
+                        continue;
+                    }
+
+                    ColorDetector colorDetector = new ColorDetector();
+                    Color average = colorDetector.detectColor(mm);
+                    mm.setAverageColor(average);
+
+                    // Get standard deviation of RGB values
+                    int stdev = (int)calculateStandardDeviation(new double[] {average.getRed(), average.getGreen(), average.getBlue()});
+
+                    // Discard objects with a low standard deviation: where all three RGB values are close to eachother (grayscale colors like black, gray and white).
+                    if (stdev < 10) {
+                        continue;
+                    }
 
                     objects.add(mm);    // Add object to list of found objects
                 }
@@ -157,5 +184,23 @@ public class BoundsDetector implements IDetector {
 
         mm.setBounds(bounds);
         return mm;
+    }
+
+    // Calculate standard deviation - https://www.programiz.com/java-programming/examples/standard-deviation
+    private double calculateStandardDeviation(double numArray[]) {
+        double sum = 0.0, standardDeviation = 0.0;
+        int length = numArray.length;
+
+        for(double num : numArray) {
+            sum += num;
+        }
+
+        double mean = sum/length;
+
+        for(double num: numArray) {
+            standardDeviation += Math.pow(num - mean, 2);
+        }
+
+        return Math.sqrt(standardDeviation/length);
     }
 }

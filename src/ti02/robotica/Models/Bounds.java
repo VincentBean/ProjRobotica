@@ -52,4 +52,8 @@ public class Bounds {
     public int getWest() {
         return West;
     }
+
+    public String toString() {
+        return "N=" + North + ", E=" + East + ", S=" + South + ", W=" + West;
+    }
 }
