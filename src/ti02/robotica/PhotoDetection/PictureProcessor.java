@@ -42,60 +42,63 @@ public class PictureProcessor {
 
         Color average = null;
         // Go through all found objects
-        for (ti02.robotica.Models.Object object : objects) {
-            Color colorResult = colorDetector.detectColor(object);  // Get average color of object
+        if (objects.size() >= 1) {  // Check if there's at least one object
+            for (ti02.robotica.Models.Object object : objects) {
+                Color colorResult = colorDetector.detectColor(object);  // Get average color of object
 
-            // Set color for first time
-            if (average == null) {
-                average = colorResult;
-                continue;
+                // Set color for first time
+                if (average == null) {
+                    average = colorResult;
+                    continue;
+                }
+
+                // Calculate average of all objects
+                average = new java.awt.Color(
+                        (int) incrementalAverage(average.getRed(), colorResult.getRed()),
+                        (int) incrementalAverage(average.getGreen(), colorResult.getGreen()),
+                        (int) incrementalAverage(average.getBlue(), colorResult.getBlue()));
+
+                // Draw bounds for debugging
+                java.awt.Color[][] pixels = object.getPixels();
+                Bounds bounds = object.getBounds();
+
+                CurrentLogger.Logger.Debug("north=" + bounds.getNorth() + ", east=" + bounds.getEast() + ", south=" + bounds.getSouth() + ", west=" + bounds.getWest());
+
+                // TODO: replace hardcoded value for 'blockSize'
+                // Draw west and east bounds
+                for (int x = bounds.getWest() * 20; x < bounds.getEast() * 20; x++) {
+                    mmPicture.setPixel(x, bounds.getSouth() * 20, colorResult.getRGB());
+                    mmPicture.setPixel(x, bounds.getNorth() * 20, colorResult.getRGB());
+                }
+
+                // Draw north and south bounds
+                for (int y = bounds.getNorth() * 20; y < bounds.getSouth() * 20; y++) {
+                    mmPicture.setPixel(bounds.getWest() * 20, y, colorResult.getRGB());
+                    mmPicture.setPixel(bounds.getEast() * 20, y, colorResult.getRGB());
+                }
+
             }
 
-            // Calculate average of all objects
-            average = new java.awt.Color(
-                    (int)incrementalAverage(average.getRed(), colorResult.getRed()),
-                    (int)incrementalAverage(average.getGreen(), colorResult.getGreen()),
-                    (int)incrementalAverage(average.getBlue(), colorResult.getBlue()));
+            // Find matching Enum color
+            ti02.robotica.Enums.Color convertedColor = colorDetector.convertColor(average, 15);
+            CurrentLogger.Logger.Info(convertedColor + ", " + nullCount);
 
-            // Draw bounds for debugging
-            java.awt.Color[][] pixels = object.getPixels();
-            Bounds bounds = object.getBounds();
+            // Open matching gate
+            if (convertedColor != null) {
+                nullCount = 0;          // Color found, reset null counter
+                System.out.printf("Opening gate %d\n", convertedColor.ordinal());
+                Controller.OpenGate(convertedColor.ordinal());
+            } else {
+                nullCount++;            // 'Null' found, increment count
 
-            CurrentLogger.Logger.Debug("north="+bounds.getNorth() + ", east="+bounds.getEast() + ", south="+bounds.getSouth()+", west="+bounds.getWest());
-
-            // TODO: replace hardcoded value for 'blockSize'
-            // Draw west and east bounds
-            for (int x = bounds.getWest()*20; x < bounds.getEast()*20; x++) {
-                mmPicture.setPixel(x, bounds.getSouth()*20, colorResult.getRGB());
-                mmPicture.setPixel(x, bounds.getNorth()*20, colorResult.getRGB());
-            }
-
-            // Draw north and south bounds
-            for (int y = bounds.getNorth()*20; y < bounds.getSouth()*20; y++) {
-                mmPicture.setPixel(bounds.getWest()*20, y, colorResult.getRGB());
-                mmPicture.setPixel(bounds.getEast()*20, y, colorResult.getRGB());
-            }
-
-        }
-
-        // Find matching Enum color
-        ti02.robotica.Enums.Color convertedColor = colorDetector.convertColor(average, 15);
-        CurrentLogger.Logger.Info(convertedColor + ", " + nullCount);
-
-        // Open matching gate
-        if (convertedColor != null) {
-            nullCount = 0;          // Color found, reset null counter
-            System.out.printf("Opening gate %d\n", convertedColor.ordinal());
-            Controller.OpenGate(convertedColor.ordinal());
-        } else {
-            nullCount++;            // 'Null' found, increment count
-
-            if (nullCount >= 25) {  // If no color has been found after 25 frames
-                nullCount = 0;
-                Controller.Feed();  // Rotate carousel
-                try {
-                    Thread.sleep(1000);
-                } catch( InterruptedException e){}
+                if (nullCount >= 25) {  // If no color has been found after 25 frames
+                    nullCount = 0;
+                    Controller.Feed();  // Rotate carousel
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
             }
         }
 
