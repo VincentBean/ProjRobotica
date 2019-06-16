@@ -10,10 +10,10 @@ import java.util.ArrayList;
 public class ColorDetector implements IDetector {
     // Colors to detect
     final java.awt.Color colorBlue = new java.awt.Color(9, 74, 177);
-    final java.awt.Color colorBrown = new java.awt.Color(78, 13, 5);
+    final java.awt.Color colorBrown = new java.awt.Color(90, 20, 10);
     final java.awt.Color colorGreen = new java.awt.Color(98, 180, 9);
     final java.awt.Color colorOrange = new java.awt.Color(217, 84, 14);
-    final java.awt.Color colorRed = new java.awt.Color(198, 42, 76);
+    final java.awt.Color colorRed = new java.awt.Color(166, 2, 26);
     final java.awt.Color colorYellow = new java.awt.Color(243, 226, 7);
     final java.awt.Color colorBlack = new java.awt.Color(0, 0, 0);
 
