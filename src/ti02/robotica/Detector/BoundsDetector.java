@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 public class BoundsDetector implements IDetector {
     private BufferedImage source;
+    private ColorDetector colorDetector = new ColorDetector();
 
     @Override
     public DetectorResult<Bounds> detect() {
@@ -96,7 +97,7 @@ public class BoundsDetector implements IDetector {
         // Iiterate through blocks and check if neighboring blocks also contain an object
         for (int x = 0; x < objectFound.length; x++) {
             for (int y = 0; y < objectFound[x].length; y++) {
-//                CurrentLogger.Logger.Info("X = "+x+", Y="+y);
+//                System.out.println("X = "+x+", Y="+y);
                 if (objectFound[x][y]) {
                     // Create new M&M
                     ti02.robotica.Models.Object mm = CheckNeighboringBlocks(blockSize, new ti02.robotica.Models.Object(source.getWidth(), source.getHeight()), objectFound, x, y, new Bounds(y, x, y, x));
@@ -121,7 +122,6 @@ public class BoundsDetector implements IDetector {
                         continue;
                     }
 
-                    ColorDetector colorDetector = new ColorDetector();
                     Color average = colorDetector.detectColor(mm);
                     mm.setAverageColor(average);
 

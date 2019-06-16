@@ -12,10 +12,20 @@ public class HardwareController {
     private final String ACTION_TEST = "t";
     private final String ACTION_CLOSEALL = "c";
     private final String ACTION_OPENALL = "o";
+    private final String ACTION_STEP = "s";
+
+    public void setDoStep(Boolean doStep) {
+        this.doStep = doStep;
+    }
+
+    private Boolean doStep = true;
+    private long startMillis;
 
     public HardwareController(int _baudrate, String _port) {
         this._baudrate = _baudrate;
         _serial = new SerialPort(_port);
+
+        startMillis = System.currentTimeMillis();
     }
 
     public boolean Connect()
@@ -96,21 +106,32 @@ public class HardwareController {
         Write(Integer.toString(gate));
     }
 
+    public void Step() {
+        for (int i = 0; i <= 2; i++) {
+            try {
+                _serial.writeBytes("s".getBytes());
+            } catch (SerialPortException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void Write(String data)
     {
-        if(!_serial.isOpened())
-        {
-            CurrentLogger.Logger.Error("IK PROBEER TE SCHRIJVEN MAAR IK BEN NIET CONNECTED");
-            // TODO: IK PROBEER TE SCHRIJVEN MAAR IK BEN NIET CONNECTED.
-            return;
-        }
+        if (System.currentTimeMillis() > startMillis + 2000 + 5000) {
+            if (!_serial.isOpened()) {
+                CurrentLogger.Logger.Error("IK PROBEER TE SCHRIJVEN MAAR IK BEN NIET CONNECTED");
+                // TODO: IK PROBEER TE SCHRIJVEN MAAR IK BEN NIET CONNECTED.
+                return;
+            }
 
-        try {
-            _serial.writeBytes(data.getBytes());
-        }
-        catch (SerialPortException e)
-        {
-            CurrentLogger.Logger.Error(e);
+            try {
+                _serial.writeBytes(data.getBytes());
+            } catch (SerialPortException e) {
+                CurrentLogger.Logger.Error(e);
+            }
+
+            startMillis = System.currentTimeMillis();
         }
     }
 }

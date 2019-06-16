@@ -1,34 +1,51 @@
 package ti02.robotica.PhotoDetection;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import jssc.SerialPort;
+import jssc.SerialPortList;
 import ti02.robotica.Detector.BoundsDetector;
 import ti02.robotica.Detector.ColorDetector;
 import ti02.robotica.Detector.HardwareController;
-import ti02.robotica.Logging.ConsoleLogger;
 import ti02.robotica.Logging.CurrentLogger;
 import ti02.robotica.Models.Bounds;
 import ti02.robotica.Models.MMPicture;
-import ti02.robotica.Models.Pixel;
-import ti02.robotica.Models.Object;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.logging.Logger;
+import java.util.*;
 
 public class PictureProcessor {
     private int nullCount = 0;              // Amount of 'null' average colors
     private HardwareController Controller;
+    private long startMillis;
+    private boolean waitForArduino = false;
+    private ArrayList<ti02.robotica.Enums.Color> colorArray = new ArrayList<>();
 
     public PictureProcessor() {
-        Controller = new HardwareController(SerialPort.BAUDRATE_115200,"/dev/ttyACM0");
-        Controller.Connect();
+        String[] serialPorts = SerialPortList.getPortNames();
+        if (serialPorts.length != 0) {
+            Controller = new HardwareController(SerialPort.BAUDRATE_115200, serialPorts[0]);
+            Controller.Connect();
+        } else {
+            Controller = new HardwareController(0 ,"");
+        }
+
+        resetFoundColors();
+
+        startMillis = System.currentTimeMillis();
     }
 
     public MMPicture findMM(BufferedImage source) {
         MMPicture mmPicture = new MMPicture(source.getWidth(), source.getHeight());
+
+//        if (waitForArduino && System.currentTimeMillis() > startMillis + 15000) {
+//            System.out.println("waiting for ardwieno");
+//
+//            return mmPicture;
+//        }
+//
+//        startMillis = System.currentTimeMillis();
+//        waitForArduino = false;
+
 
         if (source == null) {
             CurrentLogger.Logger.Error("Source image is null!");
@@ -42,7 +59,6 @@ public class PictureProcessor {
 
         Color average = null;
         // Go through all found objects
-        if (objects.size() > 0) {  // Check if there's at least one object
             for (ti02.robotica.Models.Object object : objects) {
                 Color colorResult = colorDetector.detectColor(object);  // Get average color of object
                 object.setAverageColor(colorResult);
@@ -82,27 +98,65 @@ public class PictureProcessor {
                 }
             }
 
-            // Find matching Enum color
-            ti02.robotica.Enums.Color convertedColor = colorDetector.convertColor(average, 50);
 
-            // Open matching gate
+        // Find matching Enum color
+        ti02.robotica.Enums.Color convertedColor = null;
+            if (average != null) {
+                convertedColor = colorDetector.convertColor(average, 50);
+            }
+//        System.out.println(convertedColor + ", " + nullCount);
+
+//            java.awt.Color calibrationPixel = new Color(source.getRGB(30, 50));
+//
+//            if (calibrationPixel.getRed() > 250 && calibrationPixel.getGreen() > 250 && calibrationPixel.getBlue() > 250) {
+//                System.out.println("M&M GEVALLEN");
+//            }
+
+
+        // Open matching gate
+     //   if (System.currentTimeMillis() > startMillis + 1500) {
+     //       startMillis = System.currentTimeMillis();
+
             if (convertedColor != null) {
                 System.out.println(convertedColor + ", " + nullCount);
                 nullCount = 0;          // Color found, reset null counter
-//                Controller.OpenGate(convertedColor.ordinal());
+
+//                colorArray.add(convertedColor);
+                Controller.OpenGate(convertedColor.getGateNumber());
+//                Controller.setDoStep(false);
+
+//                if (colorArray.size() >= 3) {
+//                    ti02.robotica.Enums.Color dominantColor = null;
+//                    int dominantColorCount = 0;
+//
+//                    Set<ti02.robotica.Enums.Color> unique = new HashSet<>(colorArray);
+//                    for (ti02.robotica.Enums.Color key : unique) {
+//                        if (Collections.frequency(colorArray, key) >= dominantColorCount) {
+//                            dominantColor = key;
+//                        }
+//                    }
+//
+//                    System.out.println("GEMIDDELDE KLEUR: " + dominantColor);
+//
+//                    Controller.OpenGate(dominantColor.getGateNumber());
+////                    System.out.println("OPENING GATE " + convertedColor.getGateNumber());
+//
+//                    resetFoundColors();
+//                    waitForArduino = true;
+//                }
+
             } else {
                 nullCount++;            // 'Null' found, increment count
 
-//                if (nullCount >= 25) {  // If no color has been found after 25 frames
-//                    nullCount = 0;
+                if (nullCount >= 25) {  // If no color has been found after 25 frames
+                    nullCount = 0;
+                    Controller.Step();
+                    Controller.setDoStep(true);
 //                    Controller.Feed();  // Rotate carousel
-////                    try {
-////                        Thread.sleep(1000);
-////                    } catch (InterruptedException e) {
-////                    }
-//                }
+                    waitForArduino = true;
+                }
             }
-        }
+      //  }
 
         return mmPicture;
     }
@@ -113,5 +167,9 @@ public class PictureProcessor {
         average += new_value;
 
         return average;
+    }
+
+    void resetFoundColors() {
+        colorArray.clear();
     }
 }
