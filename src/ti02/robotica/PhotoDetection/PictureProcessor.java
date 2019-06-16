@@ -83,7 +83,7 @@ public class PictureProcessor {
             }
 
             // Find matching Enum color
-            ti02.robotica.Enums.Color convertedColor = colorDetector.convertColor(average, 100);
+            ti02.robotica.Enums.Color convertedColor = colorDetector.convertColor(average, 50);
 
             // Open matching gate
             if (convertedColor != null) {
