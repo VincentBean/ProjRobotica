@@ -1,17 +1,20 @@
 @startuml
 MMSorter -> Camera: getFrame()
 Camera --> MMSorter: Picture
-MMSorter -> Picture: runDetectors()
-loop foreach PictureDetector
-    Picture -> PictureDetector: detect()
-    PictureDetector --> Picture: DetectorResult
-end
+MMSorter -> MMPicture: findMM()
+
+MMPicture -> BoundsDetector: locateObjects()
+BoundsDetector -> MMPicture: List<Object>
+
 loop foreach Object
-    Picture -> Object: runDetectors()
-        loop foreach PictureDetector
-            Object -> ObjectDetector: detect()
-            ObjectDetector --> Object: DetectorResult
-        end
+    MMPicture -> ColorDetector: detectColor()
+    ColorDetector -> MMPicture : Color
+    alt Color is null
+       MMPicture -> HardwareController: feed()
+    else
+        MMPicture -> HardwareController: openGate(color)
+    end
+
 end
 
 @enduml

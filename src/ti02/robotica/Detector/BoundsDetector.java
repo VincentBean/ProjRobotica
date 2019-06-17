@@ -71,20 +71,6 @@ public class BoundsDetector implements IDetector {
                 averageGreen = (double)color.getGreen();
                 averageBlue = (double)color.getBlue();
 
-//                // Ga door alle pixels heen in een blok
-//                for (int Xlocal = Xblock; Xlocal < Xblock + blockSize; Xlocal++)
-//                {
-//                    for (int Ylocal = Yblock; Ylocal < Yblock + blockSize; Ylocal++)
-//                    {
-//                        // Bereken gemiddelde kleur
-//                        color = new Color(source.getRGB(Xlocal, Ylocal));
-////
-////                        averageRed = incrementalAverage(averageRed, (double)color.getRed());
-////                        averageGreen = incrementalAverage(averageGreen, (double)color.getGreen());
-////                        averageBlue = incrementalAverage(averageBlue, (double)color.getBlue());
-//                    }
-//                }
-
                 // Bepaal of er een object aanwezig is in dit blok
                 if (averageRed >= 5 && averageGreen >= 5 && averageBlue >= 5) {
                     objectFound[Xblock / blockSize][Yblock / blockSize] = true;
@@ -124,6 +110,7 @@ public class BoundsDetector implements IDetector {
 
                     Color average = colorDetector.detectColor(mm);
                     mm.setAverageColor(average);
+
 
                     // Get standard deviation of RGB values
                     int stdev = (int)calculateStandardDeviation(new double[] {average.getRed(), average.getGreen(), average.getBlue()});

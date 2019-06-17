@@ -19,7 +19,7 @@ public class HardwareController {
     }
 
     private Boolean doStep = true;
-    private long startMillis;
+    private long startMillis; // Keep track of millis to compensate for delay
 
     public HardwareController(int _baudrate, String _port) {
         this._baudrate = _baudrate;
@@ -40,11 +40,10 @@ public class HardwareController {
                     SerialPort.STOPBITS_1,
                     SerialPort.PARITY_NONE);//Set params
 
-            Thread.sleep(2000); // Give the serial connection time to setup
+            Thread.sleep(2000); // Give the serial connection time to wake up
         }
         catch (SerialPortException e)
         {
-            // TODO: LOG SERIAL OPEN FAILED
             CurrentLogger.Logger.Error(e);
             return false;
         }
@@ -107,7 +106,12 @@ public class HardwareController {
     }
 
     public void Step() {
-        for (int i = 0; i <= 2; i++) {
+        if (!_serial.isOpened()) {
+            CurrentLogger.Logger.Error("IK PROBEER TE SCHRIJVEN MAAR IK BEN NIET CONNECTED");
+            return;
+        }
+
+        for (int i = 0; i <= 2; i++) { // Do two steps (1.8 degrees)
             try {
                 _serial.writeBytes("s".getBytes());
             } catch (SerialPortException e) {
@@ -118,10 +122,10 @@ public class HardwareController {
 
     private void Write(String data)
     {
-        if (System.currentTimeMillis() > startMillis + 2000 + 5000) {
+        // Only send a command every 7 seconds to compensate for camera delays
+        if (System.currentTimeMillis() > startMillis + 7000) {
             if (!_serial.isOpened()) {
                 CurrentLogger.Logger.Error("IK PROBEER TE SCHRIJVEN MAAR IK BEN NIET CONNECTED");
-                // TODO: IK PROBEER TE SCHRIJVEN MAAR IK BEN NIET CONNECTED.
                 return;
             }
 

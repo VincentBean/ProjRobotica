@@ -38,10 +38,6 @@ class Picture {
     + RunDetectors()
 }
 
-class Camera {
-    + getFrame() : Picture
-}
-
 class HardwareController {
     + rotateCarousel() : void
     + openGate(n) : void

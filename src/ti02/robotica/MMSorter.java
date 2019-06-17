@@ -44,10 +44,10 @@ public class MMSorter {
         pictureProcessor = new PictureProcessor();
 
 //        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov");
-//        IMediaReader mediaReader = ToolFactory.makeReader("input/mms_v2.mp4");
+        IMediaReader mediaReader = ToolFactory.makeReader("input/mms_v2.mp4");
 //        IMediaReader mediaReader = ToolFactory.makeReader("input/mm_rood.png");
 
-        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://raspberrypi.local:8554/test.sdp");
+//        IMediaReader mediaReader = ToolFactory.makeReader("rtsp://raspberrypi.local:8554/test.sdp");
 //        $ raspivid -o - -t 0 -hf -w 640 -h 360 -fps 25 | cvlc -vvv stream:///dev/stdin --sout '#rtp{sdp=rtsp://127.0.0.1:8554/test.sdp}' :demux=h264
 //        $ vlc -vvv "https://www.youtube.com/watch?v=dQw4w9WgXcQ&fmt=18" --sout '#rtp{dst=127.0.0.1,port=8554,sdp=rtsp://localhost:8554/test.sdp}'
 
